@@ -11,6 +11,7 @@ package com.bar.ui.panels
 	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.display.Sprite;
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFormat;
@@ -22,6 +23,8 @@ package com.bar.ui.panels
 		public static const AVATAR_Y: int = 5;
 		public static const AVATAR_WIDTH: int = 50;
 		public static const AVATAR_HEIGHT: int = 50;
+		public static const EXP_BITMAP_X: int = 75;
+		public static const EXP_BITMAP_Y: int = 45;
 		public static const NAME_TF_X: int = 70;
 		public static const NAME_TF_Y: int = 5;
 		public static const CENTS_ICON_X: int = 200;
@@ -48,6 +51,8 @@ package com.bar.ui.panels
 		private var levelTf: TextField;
 		private var expTf: TextField;
 		private var avatarBitmap: Bitmap;
+		private var emptyExpBitmap: Bitmap;
+		private var fullExpGameObject: GameObject;
 		private var centsIcoGameObject: GameObject;
 		private var euroIcoGameObject: GameObject;
 		private var loveIcoGameObject: GameObject;
@@ -123,6 +128,17 @@ package com.bar.ui.panels
 //			centsIcoGameObject.addEventListener(GameObjectEvent.TYPE_MOUSE_CLICK, licenseButtonClick);
 			addChild(loveIcoGameObject);
 			
+			//todo
+			emptyExpBitmap = new Bitmap(new BitmapData(80, 10, false, 0x555555));
+			emptyExpBitmap.x = EXP_BITMAP_X;
+			emptyExpBitmap.y = EXP_BITMAP_Y;
+			addChild(emptyExpBitmap);
+			fullExpGameObject = new GameObject(scene);
+			fullExpGameObject.bitmap = new Bitmap(new BitmapData(80, 10, false, 0xdd0000));
+			fullExpGameObject.x = EXP_BITMAP_X;
+			fullExpGameObject.y = EXP_BITMAP_Y;
+			addChild(fullExpGameObject);
+			
 			vk = new VKontakte(Bar.viewer_id);
 			vk.addEventListener(VKontakteEvent.COMPLETED, onVKProfileCompleted);
 			vk.getProfiles([Bar.viewer_id]);
@@ -158,6 +174,11 @@ package com.bar.ui.panels
 		
 		public function set exp(value: Number): void {
 			expTf.text = value.toString() + '/' + Balance.levelExp[Bar.core.myBarPlace.user.level];
+			var mask: Sprite = new Sprite();
+			mask.graphics.beginFill(0xffffff);
+			mask.graphics.drawRect(0, 0, fullExpGameObject.width * Bar.core.myBarPlace.user.experience / Balance.levelExp[Bar.core.myBarPlace.user.level], fullExpGameObject.height);
+			mask.graphics.endFill();
+			fullExpGameObject.bitmapMask = mask;
 		}
 		
 		public function set userName(value: String): void {

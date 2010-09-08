@@ -136,7 +136,7 @@ package com.bar.model
 				var barLoadEvent: CoreEvent = new CoreEvent(CoreEvent.EVENT_BAR_LOADED);
 				if (id_user == myBarPlace.user.id_user) {
 					//todo выдача бонусных денег и любви, за каждодневное посещение
-					myBarPlace.user.experience = 1;
+					myBarPlace.user.experience = 0;
 					myBarPlace.user.level = Balance.startLevel;
 					myBarPlace.user.love = Balance.startLove;
 					myBarPlace.user.invites = 0;
@@ -529,6 +529,7 @@ package com.bar.model
 			myBarPlace.user.experience += expDelta;
 			if (myBarPlace.user.level < Balance.maxLevel &&
 				myBarPlace.user.experience >= Balance.levelExp[myBarPlace.user.level]) {
+				myBarPlace.user.experience -= Balance.levelExp[myBarPlace.user.level];
 				var eventChangeLevel: CoreEvent = new CoreEvent(CoreEvent.EVENT_USER_LEVEL_CHANGED);
 				eventChangeLevel.oldLevel = myBarPlace.user.level;
 				myBarPlace.user.level++;
