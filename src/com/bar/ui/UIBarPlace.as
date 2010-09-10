@@ -29,6 +29,7 @@ package com.bar.ui
 	import flash.filters.GlowFilter;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import flash.text.TextField;
 
 	public class UIBarPlace extends GameLayer
 	{
@@ -55,6 +56,8 @@ package com.bar.ui
 		public static const EXCHANGE_WINDOW_Z_ORDER: Number = 60;
 		public static const TOP_PANEL_Z_ORDER: Number = 37;
 		public static const PRODUCTION_SHOP_WINDOW_Z_ORDER: Number = 38;
+		public static const TUTORIAL_WINDOW_Z_ORDER: Number = 80;
+		public static const TUTORIAL_ARROW_Z_ORDER: Number = 81;
 		
 		public var goClients: Array;
 		public var goTips: Array;
@@ -802,6 +805,46 @@ package com.bar.ui
 			trace('Production Licensed: ' + event.typeProduction.type + ' Cost: ' + event.typeProduction.licenseCostCent + 'c. ' + event.typeProduction.licenseCostEuro + 'e.');
 //			modelStat.lastLevel.licensedProdTypes.push(event.typeProduction);
 			mainMenuPanel.licenseProduction(event.typeProduction);
+		}
+		
+		public static const TUTORIAL_HELLO: String = 't_hello';
+		public static const TUTORIAL_ATTRS: String = 't_attrs';
+		public static const TUTORIAL_SERVING: String = 't_serving';
+		public static const TUTORIAL_WIDTH: Number = 300;
+		public static const TUTORIAL_HEIGHT: Number = 300;
+		public var tutorialWindow: GameLayer;
+		public var tutorialArrow: GameObject;
+		public function showTutorial(state: String): void {
+			if (tutorialWindow) {
+				tutorialWindow = new GameLayer(scene);
+				tutorialWindow.visible = true;
+				tutorialWindow.zOrder = TUTORIAL_WINDOW_Z_ORDER;
+				tutorialWindow.width = TUTORIAL_WIDTH;
+				tutorialWindow.height = TUTORIAL_HEIGHT;
+				tutorialWindow.fillBackground(0xffffff, 0.9);
+			}
+			if (tutorialArrow) {
+				tutorialArrow = new GameObject(scene);
+				tutorialArrow.zOrder = TUTORIAL_ARROW_Z_ORDER;
+				tutorialArrow.visible = false;
+			}
+			switch (state) {
+				case TUTORIAL_HELLO:
+					var tf: TextField = new TextField();
+					break;
+				case TUTORIAL_ATTRS:
+					
+					break;
+				case TUTORIAL_SERVING:
+					
+					break;
+			}
+			addChild(tutorialWindow);
+		}
+		
+		public function hideTutorial(): void {
+			tutorialWindow.visible = false;
+			tutorialArrow.visible = false;
 		}
 	}
 }
