@@ -59,14 +59,19 @@ package com.bar.model
 		public function Core(viewerId: String, fullName: String, photoPath: String, srv: Server)
 		{
 			isLoaded = false;
-			firstLaunch = false;
 			addedStartProduction = false;
 			myBarPlace = new BarPlace(new User(viewerId, fullName));
 			myBarPlace.user.photoPath = photoPath;
 			server = srv;
 			if (server) {
+				// если что, то сервер пришлет уведомление, что запуск первый
+				firstLaunch = false;
 				server.addEventListener(ServerEvent.EVENT_BAR_LOADED, barLoaded);
 				server.addEventListener(ServerEvent.EVENT_FIRST_LAUNCH, firstLaunched);
+			}
+			else {
+				// сервер не доступен - не можем наверняка определить первый это запуск или нет. Считаем что первый.
+				firstLaunch = true;
 			}
 			timer = new Timer(Balance.coreTimerPeriod, 0);
 			timer.addEventListener(TimerEvent.TIMER, onTimer);

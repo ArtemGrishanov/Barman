@@ -15,6 +15,7 @@ package com.bar.ui
 	import com.bar.ui.tooltips.ClientToolTip;
 	import com.bar.ui.tooltips.ProductionToolTip;
 	import com.bar.ui.windows.ExchangeWindow;
+	import com.bar.ui.windows.Window;
 	import com.bar.util.Images;
 	import com.flashmedia.basics.GameLayer;
 	import com.flashmedia.basics.GameObject;
@@ -613,8 +614,10 @@ package com.bar.ui
 			for each (var c: Client in event.barPlace.clients) {
 				addClient(c);
 			}
-			if (Bar.viewer_id == event.user_id) {
-				
+			if (Bar.viewer_id == event.barPlace.user.id_user) {
+				if (Bar.core.firstLaunch) {
+					showTutorial(TUTORIAL_HELLO);
+				}
 			}
 			else {
 				
@@ -813,18 +816,17 @@ package com.bar.ui
 		public static const TUTORIAL_SERVING: String = 't_serving';
 		public static const TUTORIAL_WIDTH: Number = 300;
 		public static const TUTORIAL_HEIGHT: Number = 300;
-		public var tutorialWindow: GameLayer;
+		public var tutorialWindow: Window;
 		public var tutorialArrow: GameObject;
 		public function showTutorial(state: String): void {
-			if (tutorialWindow) {
-				tutorialWindow = new GameLayer(scene);
+			if (!tutorialWindow) {
+				tutorialWindow = new Window(scene, TUTORIAL_WIDTH, TUTORIAL_HEIGHT);
 				tutorialWindow.visible = true;
 				tutorialWindow.zOrder = TUTORIAL_WINDOW_Z_ORDER;
-				tutorialWindow.width = TUTORIAL_WIDTH;
-				tutorialWindow.height = TUTORIAL_HEIGHT;
-				tutorialWindow.fillBackground(0xffffff, 0.9);
+				tutorialWindow.x = (Bar.WIDTH - tutorialWindow.width) / 2;
+				tutorialWindow.y = (Bar.HEIGHT - tutorialWindow.height) / 2;
 			}
-			if (tutorialArrow) {
+			if (!tutorialArrow) {
 				tutorialArrow = new GameObject(scene);
 				tutorialArrow.zOrder = TUTORIAL_ARROW_Z_ORDER;
 				tutorialArrow.visible = false;
@@ -832,10 +834,14 @@ package com.bar.ui
 			switch (state) {
 				case TUTORIAL_HELLO:
 					var tf: TextField = new TextField();
+					tf.width = 200;
+					tf.wordWrap = true;
 					tf.autoSize = TextFieldAutoSize.LEFT;
 					tf.text = 'Привет! Поздравляю, у тебя теперь есть свой бар. ' +
 						'Здесь ты сможешь принимать посетителей и зарабатывать деньги!' +
 						'Обустраивай свой бар - сделай его самым лучшим!';
+					tf.x = (tutorialWindow.width - tf.width) / 2;
+					tf.y = (tutorialWindow.height - tf.height) / 2;
 					tutorialWindow.addChild(tf);
 					break;
 				case TUTORIAL_ATTRS:
