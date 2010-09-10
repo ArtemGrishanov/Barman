@@ -30,6 +30,7 @@ package com.bar.ui
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.text.TextField;
+	import flash.text.TextFieldAutoSize;
 
 	public class UIBarPlace extends GameLayer
 	{
@@ -831,6 +832,11 @@ package com.bar.ui
 			switch (state) {
 				case TUTORIAL_HELLO:
 					var tf: TextField = new TextField();
+					tf.autoSize = TextFieldAutoSize.LEFT;
+					tf.text = 'Привет! Поздравляю, у тебя теперь есть свой бар. ' +
+						'Здесь ты сможешь принимать посетителей и зарабатывать деньги!' +
+						'Обустраивай свой бар - сделай его самым лучшим!';
+					tutorialWindow.addChild(tf);
 					break;
 				case TUTORIAL_ATTRS:
 					
