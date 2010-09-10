@@ -35,6 +35,11 @@ package {
 		
 		public function Bar()
 		{
+			// TODO FIX
+			scaleX = 0.8;
+			scaleY = 0.8;
+			
+			MultiLoader.usingContext = true;
 			multiLoader = new MultiLoader();
 			socialNet = new SocialNet(SocialNet.NET_SANDBOX);
 //			server = new Server(host, port, true);
