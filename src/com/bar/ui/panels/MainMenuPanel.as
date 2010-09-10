@@ -329,15 +329,46 @@ package com.bar.ui.panels
 		}
 		
 		/**
-		 * Покупка декора
+		 * Установить декор, доступный для покупки
 		 */
-		public function buyDecor(decorType: DecorType): void {
+		public function setDecorForSell(decorTypes: Array): void {
 			for each (var d: DecorPanel in decorCells) {
-				if (d.decorType.type == decorType.type) {
-					//todo something
+				d.enabled = false;
+				for each (var decorType: DecorType in decorTypes) {
+					if (d.decorType.type == decorType.type) {
+						// enable or disable
+						d.enabled = true;
+						break;
+					}
 				}
 			}
 		}
+		
+//		/**
+//		 * Покупка декора
+//		 */
+//		public function buyDecor(decorType: DecorType): void {
+//			for each (var d: DecorPanel in decorCells) {
+//				if (d.decorType.type == decorType.type) {
+//					//delete this decor from decorCells
+//					decorCells.splice(decorCells.indexOf(d), 1);
+//					//Замещаемый декор становится снова доступным в магазине (см. Core)
+//					var s: String = 'asas';
+//					s.
+//				}
+//			}
+//			if (state == STATE_DECOR) {
+//				showPage(currentDecorPage);
+//			}
+//		}
+		
+//		/**
+//		 * Удаление декора из бара - он снова доступен для покупки
+//		 */
+//		public function deleteDecorFromBar(decorType: DecorType): void {
+//			//TODO somesing
+//			
+//		}
 	
 		/**
 		 * types - array of ProductionType
@@ -386,7 +417,18 @@ package com.bar.ui.panels
 		 * types - array of DecorType
 		 */
 		public function addDecor(types: Array, userLevel: int): void {
+			decorCells = new Array();
 			for each (var t: DecorType in types) {
+				var decorTypeExist: Boolean = false;
+				for each (var dp: DecorPanel in decorCells) {
+					if (dp.decorType.type == t.type) {
+						decorTypeExist = true;
+						break;
+					}
+				}
+				if (decorTypeExist) {
+					continue;
+				}
 				if (t.bitmap && t.bitmapSmall) {
 					var panel: DecorPanel = new DecorPanel(scene, t, this);
 					panel.setHover(true);

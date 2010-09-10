@@ -124,22 +124,24 @@ package com.bar.model
 		 */
 		public static function initDecorTypes(): void {
 			decorTypes = new Array();
-			decorTypes.push(new DecorType('picture1', 'Картина 1', 0, 0, 0, 0, 0, 0, 10, 535, 155));
-			decorTypes.push(new DecorType('shkaf1', 'Шкаф 1', 0, 0, 0, 0, 0, 0, 5, 241, 60));
-			decorTypes.push(new DecorType('wall1', 'Стена 1', 0, 0, 0, 0, 0, 0, 2, 0, 60));
-			decorTypes.push(new DecorType('bartable1', 'Барная стойка 1', 0, 0, 0, 0, 0, 0, 20, 0, 428));
-			decorTypes.push(new DecorType('stul1', 'Стул 1', 0, 0, 0, 0, 0, 0, 23, 50, 523));
-			decorTypes.push(new DecorType('stul1', 'Стул 1', 0, 0, 0, 0, 0, 0, 23, 230, 523));
-			decorTypes.push(new DecorType('stul1', 'Стул 1', 0, 0, 0, 0, 0, 0, 23, 410, 523));
-			decorTypes.push(new DecorType('stul1', 'Стул 1', 0, 0, 0, 0, 0, 0, 23, 590, 523));
-			decorTypes.push(new DecorType('lamp1', 'Лампа 1', 0, 0, 0, 0, 0, 0, 40, 83, 60));
-			decorTypes.push(new DecorType('lamp1', 'Лампа 1', 0, 0, 0, 0, 0, 0, 40, 565, 60));
-			decorTypes.push(new DecorType('woman_body', 'Бармен Девушка', 0, 0, 0, 0, 0, 0, 5, 56, 185));
-			decorTypes.push(new DecorType('woman_pants1', 'Трусы 1', 0, 0, 0, 0, 0, 0, 6, 112, 374));
-			decorTypes.push(new DecorType('woman_bust1', 'Ливчик 1', 0, 0, 0, 0, 0, 0, 6, 103, 264));
-			decorTypes.push(new DecorType('woman_tshirt1', 'Блузка 1', 0, 0, 0, 0, 0, 0, 8, 97, 255));
-			decorTypes.push(new DecorType('woman_skirt1', 'Юбка 1', 0, 0, 0, 0, 0, 0, 7, 111, 359));
-			decorTypes.push(new DecorType('bartable_back1', 'Барная стойка задняя 1', 0, 0, 0, 0, 0, 0, 4, 0, 401));
+			decorTypes.push(new DecorType('picture1', 'Картина 1', 'pic_right', 0, 0, 0, 0, 0, 0, 10, 535, 155));
+			decorTypes.push(new DecorType('shkaf1', 'Шкаф 1', 'shkaf', 0, 0, 0, 0, 0, 0, 5, 241, 60));
+			decorTypes.push(new DecorType('wall1', 'Стена 1', 'wall', 0, 0, 0, 0, 0, 0, 2, 0, 60));
+			decorTypes.push(new DecorType('bartable1', 'Барная стойка 1', 'bartable', 0, 0, 0, 0, 0, 0, 20, 0, 428));
+			decorTypes.push(new DecorType('stul1', 'Стул 1', 'stul', 0, 0, 0, 0, 0, 0, 23, 50, 523));
+			decorTypes.push(new DecorType('stul1', 'Стул 1', 'stul', 0, 0, 0, 0, 0, 0, 23, 230, 523));
+			decorTypes.push(new DecorType('stul1', 'Стул 1', 'stul', 0, 0, 0, 0, 0, 0, 23, 410, 523));
+			decorTypes.push(new DecorType('stul1', 'Стул 1', 'stul', 0, 0, 0, 0, 0, 0, 23, 590, 523));
+			decorTypes.push(new DecorType('lamp1', 'Лампа 1', 'top_lamp', 0, 0, 0, 0, 0, 0, 40, 83, 60));
+			decorTypes.push(new DecorType('lamp1', 'Лампа 1', 'top_lamp', 0, 0, 0, 0, 0, 0, 40, 565, 60));
+			decorTypes.push(new DecorType('woman_body', 'Бармен Девушка', 'woman_body', 0, 0, 0, 0, 0, 0, 5, 56, 185));
+			decorTypes.push(new DecorType('woman_pants1', 'Трусы 1', 'woman_pants', 0, 0, 0, 0, 0, 0, 6, 112, 374));
+			decorTypes.push(new DecorType('woman_bust1', 'Ливчик 1', 'woman_bust', 0, 0, 0, 0, 0, 0, 6, 103, 264));
+			decorTypes.push(new DecorType('woman_tshirt1', 'Блузка 1', 'woman_tshirt', 0, 0, 0, 0, 0, 0, 8, 97, 255));
+			decorTypes.push(new DecorType('woman_skirt1', 'Юбка 1', 'woman_skirt', 0, 0, 0, 0, 0, 0, 7, 111, 359));
+			decorTypes.push(new DecorType('bartable_back1', 'Барная стойка задняя 1', 'bartable_back', 0, 0, 0, 0, 0, 0, 4, 0, 401));
+			decorTypes.push(new DecorType('picture2', 'Картина 2', 'pic_right', 0, 0, 0, 0, 0, 0, 10, 535, 155));
+			decorTypes.push(new DecorType('picture3', 'Картина 3', 'pic_right', 0, 0, 0, 0, 0, 0, 10, 535, 155));
 			//decorTypes.push(new DecorType('Audio', 'Магнитофон', 2, 30, 20, 0.08, 800, 0, 350, 120));
 		}
 		

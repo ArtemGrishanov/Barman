@@ -11,6 +11,8 @@ package com.bar.util
 		public static const CLIENT1:String = 'http://www.fcapi.ru/images_bar/client1.png';
 		public static const LAMP1:String = 'http://www.fcapi.ru/images_bar/lamp1.png';
 		public static const PICTURE1:String = 'http://www.fcapi.ru/images_bar/picture1.png';
+		public static const PICTURE2:String = 'http://www.fcapi.ru/images_bar/picture2.png';
+		public static const PICTURE3:String = 'http://www.fcapi.ru/images_bar/picture3.png';
 		public static const SHKAF1:String = 'http://www.fcapi.ru/images_bar/shkaf1.png';
 		public static const STUL1:String = 'http://www.fcapi.ru/images_bar/stul1.png';
 		public static const WALL1:String = 'http://www.fcapi.ru/images_bar/wall1.png';
@@ -67,6 +69,8 @@ package com.bar.util
 			CLIENT1,
 			LAMP1,
 			PICTURE1,
+			PICTURE2,
+			PICTURE3,
 			SHKAF1,
 			STUL1,
 			WALL1,

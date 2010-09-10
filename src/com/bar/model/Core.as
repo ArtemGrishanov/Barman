@@ -489,6 +489,24 @@ package com.bar.model
 		}
 		
 		/**
+		 * Возвращает, какой декор сейчас доступен для покупки
+		 * Пользователю может не хватать денег, уровня и т.п. - декор недоступен.
+		 * @return DecorType array
+		 */
+		public function enableForBuyDecor(): Array {
+			var result: Array = new Array();
+			for each (var d: DecorType in decorTypes) {
+				if (myBarPlace.user.level >= d.accessLevel &&
+					myBarPlace.user.canBuyDecor(d) &&
+					!myBarPlace.decorExist(d)
+					) {
+					result.push(d);
+				}
+			}
+			return (result.length > 0) ? result: null;
+		}
+		
+		/**
 		 * Купить декор в бар.
 		 * @return - возвращает true, если хватило денег и декор реально куплен.
 		 */
@@ -505,6 +523,12 @@ package com.bar.model
 			}
 			if (myBarPlace.user.level >= typeDecor.accessLevel &&
 					myBarPlace.user.canBuyDecor(typeDecor)) {
+				// удалить декор соответствующей категории - замещение
+				for each (var decor: Decor in myBarPlace.decor) {
+					if ((decor.typeDecor.type != typeDecor.type) && (decor.typeDecor.category == typeDecor.category)) {
+						myBarPlace.decor.splice(myBarPlace.decor.indexOf(decor), 1);
+					}
+				}
 				var d: Decor = new Decor(typeDecor);
 				myBarPlace.decor.push(d);
 				var eventDecorAdded: CoreEvent = new CoreEvent(CoreEvent.EVENT_DECOR_ADDED_TO_BAR);

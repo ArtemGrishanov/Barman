@@ -1,11 +1,17 @@
 package com.bar.model.essences
 {
+	import com.flashmedia.util.BitmapUtil;
+	
 	import flash.display.Bitmap;
 	
 	public class DecorType
 	{
 		public var type: String = '';
 		public var name: String = '';
+		/**
+		 * Категория. Декор одной категории и разного типа заменяется при установке.
+		 */
+		public var category: String = '';
 		public var accessLevel: uint;
 		public var expCount: Number = 1;
 		public var loveCount: Number = 1;
@@ -24,7 +30,7 @@ package com.bar.model.essences
 		/**
 		 * Изображение, которое показывается в баре
 		 */
-		public var bitmap: Bitmap;
+		private var _bitmap: Bitmap;
 		/**
 		 * Иконка, которая показывается в магазине
 		 */
@@ -32,6 +38,7 @@ package com.bar.model.essences
 		
 		public function DecorType(_type: String,
 								_name: String,
+								_category: String = null,
 								_accessLevel: uint = 0,
 								_expCount: Number = 1,
 								_loveCount: Number = 1,
@@ -46,6 +53,7 @@ package com.bar.model.essences
 		{
 			type = _type;
 			name = _name;
+			category = _category;
 			accessLevel = _accessLevel;
 			expCount = _expCount;
 			loveCount = _loveCount;
@@ -55,9 +63,17 @@ package com.bar.model.essences
 			zOrder = _zOrder;
 			x = _x;
 			y = _y;
-			bitmap = _bitmap;
+			this._bitmap = _bitmap;
 			bitmapSmall = _bitmapSmall;
 		}
-
+		
+		public function set bitmap(value: Bitmap): void {
+			_bitmap = value;
+			bitmapSmall = BitmapUtil.scaleImageWidthHeight(_bitmap, 30, 30, true);
+		}
+		
+		public function get bitmap(): Bitmap {
+			return _bitmap;
+		}
 	}
 }

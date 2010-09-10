@@ -9,7 +9,6 @@ package com.bar.ui
 	import com.bar.ui.panels.ClientButtonsPanel;
 	import com.bar.ui.panels.ClientOrderPanel;
 	import com.bar.ui.panels.ClientOrderPanelEvent;
-	import com.bar.ui.panels.ExchangePanel;
 	import com.bar.ui.panels.MainMenuPanel;
 	import com.bar.ui.panels.MainMenuPanelEvent;
 	import com.bar.ui.panels.TopPanel;
@@ -111,20 +110,20 @@ package com.bar.ui
 			
 			
 			Balance.decorTypes[0].bitmap = Bar.multiLoader.get(Images.PICTURE1);
-			Balance.decorTypes[0].bitmapSmall = new Bitmap(new BitmapData(20, 20, false, 0xffd1d4));
+//			Balance.decorTypes[0].bitmapSmall = new Bitmap(new BitmapData(20, 20, false, 0xffd1d4));
 			Balance.decorTypes[1].bitmap = Bar.multiLoader.get(Images.SHKAF1);
-			Balance.decorTypes[1].bitmapSmall = new Bitmap(new BitmapData(20, 20, false, 0xa3d0e4));
+//			Balance.decorTypes[1].bitmapSmall = new Bitmap(new BitmapData(20, 20, false, 0xa3d0e4));
 			Balance.decorTypes[2].bitmap = Bar.multiLoader.get(Images.WALL1);
-			Balance.decorTypes[2].bitmapSmall = new Bitmap(new BitmapData(20, 20, false, 0xa3d0e4));
+//			Balance.decorTypes[2].bitmapSmall = new Bitmap(new BitmapData(20, 20, false, 0xa3d0e4));
 			Balance.decorTypes[3].bitmap = Bar.multiLoader.get(Images.BARTABLE1);
-			Balance.decorTypes[3].bitmapSmall = new Bitmap(new BitmapData(20, 20, false, 0xa3d0e4));
+//			Balance.decorTypes[3].bitmapSmall = new Bitmap(new BitmapData(20, 20, false, 0xa3d0e4));
 			for (var i: int = 4; i <= 7; i++) {
 				Balance.decorTypes[i].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.STUL1));
-				Balance.decorTypes[i].bitmapSmall = BitmapUtil.cloneBitmap(new Bitmap(new BitmapData(20, 20, false, 0xa3d0e4)));
+//				Balance.decorTypes[i].bitmapSmall = BitmapUtil.cloneBitmap(new Bitmap(new BitmapData(20, 20, false, 0xa3d0e4)));
 			}
 			for (i = 8; i <= 9; i++) {
 				Balance.decorTypes[i].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.LAMP1));
-				Balance.decorTypes[i].bitmapSmall = BitmapUtil.cloneBitmap(new Bitmap(new BitmapData(20, 20, false, 0xa3d0e4)));
+//				Balance.decorTypes[i].bitmapSmall = BitmapUtil.cloneBitmap(new Bitmap(new BitmapData(20, 20, false, 0xa3d0e4)));
 			}
 			Balance.decorTypes[10].bitmap = Bar.multiLoader.get(Images.WOMAN_BODY);
 			Balance.decorTypes[11].bitmap = Bar.multiLoader.get(Images.WOMAN_PANTS1);
@@ -132,6 +131,8 @@ package com.bar.ui
 			Balance.decorTypes[13].bitmap = Bar.multiLoader.get(Images.WOMAN_TSHIRT1);
 			Balance.decorTypes[14].bitmap = Bar.multiLoader.get(Images.WOMAN_SKIRT1);
 			Balance.decorTypes[15].bitmap = Bar.multiLoader.get(Images.BARTABLE_BACK1);
+			Balance.decorTypes[16].bitmap = Bar.multiLoader.get(Images.PICTURE2);
+			Balance.decorTypes[17].bitmap = Bar.multiLoader.get(Images.PICTURE3);
 			
 			//todo remove
 			graphics.lineStyle(2, 0xff0000);
@@ -339,10 +340,20 @@ package com.bar.ui
 		
 		public function mainMenuDecorOver(event: MainMenuPanelEvent): void {
 			if (!Bar.core.myBarPlace.decorExist(event.decorType) && Bar.core.myBarPlace.user.level >= event.decorType.accessLevel) {
+				// скрыть существующий декор этой категории при предпросмотре
+				for each (var d: Decor in Bar.core.myBarPlace.decor) {
+					if (d.typeDecor.category == event.decorType.category) {
+						for each (go in goDecor) {
+							if (go.type == d.typeDecor.type) {
+								go.visible = false;
+							}
+						}
+					}
+				}
+				// предпросмотр декора
 				for each (var go: GameObject in goDecor) {
 					if (go.type == event.decorType.type) {
 						go.visible = true;
-						break;
 					}
 				}
 			}
@@ -353,7 +364,16 @@ package com.bar.ui
 				for each (var go: GameObject in goDecor) {
 					if (go.type == event.decorType.type) {
 						go.visible = false;
-						break;
+					}
+				}
+				// вернуть существующий декор этой категории при предпросмотре
+				for each (var d: Decor in Bar.core.myBarPlace.decor) {
+					if (d.typeDecor.category == event.decorType.category) {
+						for each (go in goDecor) {
+							if (go.type == d.typeDecor.type) {
+								go.visible = true;
+							}
+						}
 					}
 				}
 			}
@@ -577,12 +597,12 @@ package com.bar.ui
 				//trace('    Production: ' + p.typeProduction.name + '(' + p.partsCount + ') ' + p.id);
 				addProduction(p);
 			}
+			mainMenuPanel.setDecorForSell(Bar.core.enableForBuyDecor());
 			for each (var d: Decor in event.barPlace.decor) {
 				for each (var go: GameObject in goDecor) {
 					if (go.type == d.typeDecor.type) {
 						go.visible = true;
 						go.alpha = 1.0;
-						//break;
 					}
 				}
 			}
@@ -754,12 +774,26 @@ package com.bar.ui
 		public function addDecorToBar(event: CoreEvent): void {
 			trace('Decor added to bar:: Decor: ' + event.decor.typeDecor.name + '. Id:' + event.decor.id);
 //			modelStat.lastLevel.decor.push(event.decor);
-			mainMenuPanel.buyDecor(event.decor.typeDecor);
+			// при замещении декора из одной категории - старый декор необходимо сделать полупрозрачным
+			for each (var dt: DecorType in Balance.decorTypes) {
+				if (
+					(dt.category == event.decor.typeDecor.category)
+					&& (dt.type != event.decor.typeDecor.type)
+				) {
+					for each (go in goDecor) {
+						if (go.type == dt.type) {
+							go.visible = false;
+							go.alpha = 0.5;
+						}
+					}
+				}
+			}
+			// обновить декор в магазине на главной панели
+			mainMenuPanel.setDecorForSell(Bar.core.enableForBuyDecor());
 			for each (var go: GameObject in goDecor) {
 				if (go.type == event.decor.typeDecor.type) {
 					go.visible = true;
 					go.alpha = 1.0;
-					break;
 				}
 			}
 		}
