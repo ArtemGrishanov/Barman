@@ -5,12 +5,16 @@ package com.bar.ui
 	import com.bar.model.essences.Client;
 	import com.bar.model.essences.Decor;
 	import com.bar.model.essences.DecorType;
+	import com.bar.model.essences.GoodsType;
 	import com.bar.model.essences.Production;
+	import com.bar.model.essences.ProductionType;
 	import com.bar.ui.panels.ClientButtonsPanel;
 	import com.bar.ui.panels.ClientOrderPanel;
 	import com.bar.ui.panels.ClientOrderPanelEvent;
+	import com.bar.ui.panels.GoodsPanel;
 	import com.bar.ui.panels.MainMenuPanel;
 	import com.bar.ui.panels.MainMenuPanelEvent;
+	import com.bar.ui.panels.ProductionPanel;
 	import com.bar.ui.panels.TopPanel;
 	import com.bar.ui.tooltips.ClientToolTip;
 	import com.bar.ui.tooltips.ProductionToolTip;
@@ -21,6 +25,7 @@ package com.bar.ui
 	import com.flashmedia.basics.GameObject;
 	import com.flashmedia.basics.GameObjectEvent;
 	import com.flashmedia.basics.GameScene;
+	import com.flashmedia.basics.View;
 	import com.flashmedia.basics.actions.Visible;
 	import com.flashmedia.util.BitmapUtil;
 	
@@ -60,6 +65,7 @@ package com.bar.ui
 		public static const PRODUCTION_SHOP_WINDOW_Z_ORDER: Number = 38;
 		public static const TUTORIAL_WINDOW_Z_ORDER: Number = 80;
 		public static const TUTORIAL_ARROW_Z_ORDER: Number = 81;
+		public static const UP_LEVEL_WINDOW_Z_ORDER: Number = 90;
 		
 		public var goClients: Array;
 		public var goTips: Array;
@@ -87,7 +93,11 @@ package com.bar.ui
 			
 			//todo resourse loading
 			Balance.clientTypes[0].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.CLIENT1));
-			Balance.clientTypes[1].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.CLIENT1));
+			Balance.clientTypes[1].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.CLIENT2));
+			Balance.clientTypes[2].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.CLIENT3));
+			Balance.clientTypes[3].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.CLIENT4));
+			Balance.clientTypes[4].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.CLIENT5));
+			Balance.clientTypes[5].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.CLIENT6));
 			
 			//1 level
 			Balance.goodsTypes[0].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_BEER));
@@ -615,6 +625,7 @@ package com.bar.ui
 				addClient(c);
 			}
 			if (Bar.viewer_id == event.barPlace.user.id_user) {
+				//TODO при переходах с бара на бар всегда будет показываться туториал
 				if (Bar.core.firstLaunch) {
 					showTutorial(TUTORIAL_HELLO);
 				}
@@ -659,6 +670,9 @@ package com.bar.ui
 			cOrderPanel.visible = false;
 			deleteClient(event.client);
 			highLightNeedProduction();
+			if (event.firstClientServed) {
+				showTutorial(TUTORIAL_AFTER_FIRST_SERVE);
+			}
 		}
 		
 		public function clientStatusChanged(event: CoreEvent): void {
@@ -750,6 +764,10 @@ package com.bar.ui
 			trace('Level: ' + event.newLevel + ' (' + ((event.newLevel > event.oldLevel)?'+':'') + d + ')');
 			topPanel.level = event.newLevel;
 			mainMenuPanel.setLevel(Bar.core.myBarPlace.user.licensedProdTypes, event.newLevel);
+			if (Bar.core.firstLaunch) {
+				showTutorial(TUTORIAL_LEVEL2_UP);
+			}
+			showUpLevel(event.newLevel);
 //			modelStat.lastLevel.endLevel();
 //			trace(modelStat.lastLevel.toString());
 //			modelStat.startNewLevel(event.newLevel);
@@ -811,52 +829,299 @@ package com.bar.ui
 			mainMenuPanel.licenseProduction(event.typeProduction);
 		}
 		
+		//-----------------------------------------------------------------------
+		//-----------------------------------------------------------------------
+		// Окна туториала
+		//-----------------------------------------------------------------------
+		//-----------------------------------------------------------------------
+		
 		public static const TUTORIAL_HELLO: String = 't_hello';
 		public static const TUTORIAL_ATTRS: String = 't_attrs';
 		public static const TUTORIAL_SERVING: String = 't_serving';
+		public static const TUTORIAL_AFTER_FIRST_SERVE: String = 't_after_first_serve';
+		public static const TUTORIAL_LEVEL2_UP: String = 't_level2_up';
+		
 		public static const TUTORIAL_WIDTH: Number = 300;
 		public static const TUTORIAL_HEIGHT: Number = 300;
+		public static const TUTORIAL_TEXT_WIDTH: Number = 200;
+		public static const TUTORIAL_TEXT_Y: Number = 30;
+		public static const TUTORIAL_BTN_Y: Number = 250;
+		public static const TUTORIAL_BTN_WIDTH: Number = 100;
+		public static const TUTORIAL_BTN_HEIGHT: Number = 30;
 		public var tutorialWindow: Window;
 		public var tutorialArrow: GameObject;
+		public var tutorialNextButton: GameObject;
+		public var tutorialGoButton: GameObject;
+		public var tutorialMessageTextField: TextField;
+		public var tutorialState: String;
 		public function showTutorial(state: String): void {
+			tutorialState = state;
 			if (!tutorialWindow) {
 				tutorialWindow = new Window(scene, TUTORIAL_WIDTH, TUTORIAL_HEIGHT);
-				tutorialWindow.visible = true;
 				tutorialWindow.zOrder = TUTORIAL_WINDOW_Z_ORDER;
 				tutorialWindow.x = (Bar.WIDTH - tutorialWindow.width) / 2;
 				tutorialWindow.y = (Bar.HEIGHT - tutorialWindow.height) / 2;
+				addChild(tutorialWindow);
 			}
+			tutorialWindow.visible = true;
 			if (!tutorialArrow) {
 				tutorialArrow = new GameObject(scene);
 				tutorialArrow.zOrder = TUTORIAL_ARROW_Z_ORDER;
-				tutorialArrow.visible = false;
+				addChild(tutorialArrow);
 			}
-			switch (state) {
+			tutorialArrow.visible = false;
+			if (!tutorialNextButton) {
+				tutorialNextButton = new GameObject(scene);
+				tutorialNextButton.x = (TUTORIAL_WIDTH - TUTORIAL_BTN_WIDTH) / 2;
+				tutorialNextButton.y = TUTORIAL_BTN_Y;
+				tutorialNextButton.setSelect(true);
+				tutorialNextButton.bitmap = new Bitmap(new BitmapData(TUTORIAL_BTN_WIDTH, TUTORIAL_BTN_HEIGHT, false, 0xff0000));
+				var btf: TextField = new TextField();
+				btf.width = 200;
+				btf.selectable = false;
+				btf.autoSize = TextFieldAutoSize.LEFT;
+				btf.text = 'Далее';
+				tutorialNextButton.setTextField(btf, View.ALIGN_HOR_CENTER | View.ALIGN_VER_CENTER);
+				tutorialWindow.addChild(tutorialNextButton);
+				tutorialNextButton.addEventListener(GameObjectEvent.TYPE_MOUSE_CLICK, function (event: GameObjectEvent): void {
+					switch (tutorialState) {
+						case TUTORIAL_HELLO:
+							showTutorial(TUTORIAL_ATTRS);
+						break;
+						case TUTORIAL_ATTRS:
+							showTutorial(TUTORIAL_SERVING);
+						break;
+						case TUTORIAL_SERVING:
+						break;
+						case TUTORIAL_AFTER_FIRST_SERVE:
+						break;
+						case TUTORIAL_LEVEL2_UP:
+						break;
+					}
+				});
+			}
+			tutorialNextButton.visible = false;
+			if (!tutorialGoButton) {
+				tutorialGoButton = new GameObject(scene);
+				tutorialGoButton.x = (TUTORIAL_WIDTH - TUTORIAL_BTN_WIDTH) / 2;
+				tutorialGoButton.y = TUTORIAL_BTN_Y;
+				tutorialGoButton.width = TUTORIAL_BTN_WIDTH;
+				tutorialGoButton.height = TUTORIAL_BTN_HEIGHT;
+				tutorialGoButton.setSelect(true);
+				tutorialGoButton.bitmap = new Bitmap(new BitmapData(TUTORIAL_BTN_WIDTH, TUTORIAL_BTN_HEIGHT, false, 0xff0000));
+				btf = new TextField();
+				btf.width = 200;
+				btf.autoSize = TextFieldAutoSize.LEFT;
+				btf.text = 'Играть!';
+				tutorialGoButton.setTextField(btf, View.ALIGN_HOR_CENTER | View.ALIGN_VER_CENTER);
+				tutorialWindow.addChild(tutorialGoButton);
+				tutorialGoButton.addEventListener(GameObjectEvent.TYPE_MOUSE_CLICK, function (event: GameObjectEvent): void {
+					switch (tutorialState) {
+						case TUTORIAL_HELLO:
+						break;
+						case TUTORIAL_ATTRS:
+						break;
+						case TUTORIAL_SERVING:
+							hideTutorial();
+						break;
+						case TUTORIAL_AFTER_FIRST_SERVE:
+							hideTutorial();
+						break;
+						case TUTORIAL_LEVEL2_UP:
+							hideTutorial();
+						break;
+					}
+				});
+			}
+			tutorialGoButton.visible = false;
+			if (!tutorialMessageTextField) {
+				tutorialMessageTextField = new TextField();
+				tutorialMessageTextField.width = TUTORIAL_TEXT_WIDTH;
+				tutorialMessageTextField.wordWrap = true;
+				tutorialMessageTextField.selectable = false;
+				tutorialMessageTextField.autoSize = TextFieldAutoSize.CENTER;
+				tutorialMessageTextField.x = (tutorialWindow.width - tutorialMessageTextField.width) / 2;
+				tutorialMessageTextField.y = TUTORIAL_TEXT_Y;
+				tutorialWindow.addChild(tutorialMessageTextField);
+			}
+			tutorialMessageTextField.visible = false;
+//			if (tutorialWindow.contains(messageTextField)) {
+//				tutorialWindow.removeChild(messageTextField);
+//			}
+			switch (tutorialState) {
 				case TUTORIAL_HELLO:
-					var tf: TextField = new TextField();
-					tf.width = 200;
-					tf.wordWrap = true;
-					tf.autoSize = TextFieldAutoSize.LEFT;
-					tf.text = 'Привет! Поздравляю, у тебя теперь есть свой бар. ' +
-						'Здесь ты сможешь принимать посетителей и зарабатывать деньги!' +
+					tutorialMessageTextField.text = 'Привет! Поздравляю, у тебя теперь есть свой бар.\n' +
+						'Здесь ты сможешь принимать посетителей и зарабатывать деньги!\n' +
 						'Обустраивай свой бар - сделай его самым лучшим!';
-					tf.x = (tutorialWindow.width - tf.width) / 2;
-					tf.y = (tutorialWindow.height - tf.height) / 2;
-					tutorialWindow.addChild(tf);
+					tutorialMessageTextField.visible = true;
+					tutorialNextButton.visible = true;
 					break;
 				case TUTORIAL_ATTRS:
-					
+					//TODO arrow
+					//TODO иконки характеристик
+					tutorialMessageTextField.text = 'Тебе как владельцу бара стоит знать все основные характеристики бара:\n' + 
+							'Уровень - отображается рядом с твоим аватаром\n' + 
+							'Любовь - насколько твой бар любят клиенты. Чем больше любовь, тем выше количество посетителей.\n' + 
+							'Центы - монетки\n' + 
+							'Евро - специальные возможности.';
+					tutorialMessageTextField.visible = true;
+					tutorialNextButton.visible = true;
 					break;
 				case TUTORIAL_SERVING:
-					
+					//TODO arrow
+					//TODO иконка кнопки обслужить
+					tutorialMessageTextField.text = 'А вот и твой первый посетитель!\n' + 
+							'Кликай на посетителя, а затем на кнопку "Обслужить".\n' + 
+							'Для приготовления коктейля перетаскивай нужную продукцию с полки на панель с изображением коктейля.';
+					tutorialMessageTextField.visible = true;
+					tutorialGoButton.visible = true;
+					break;
+				case TUTORIAL_AFTER_FIRST_SERVE:
+					//TODO arrow to shop
+					//TODO иконка магазина продукции
+					tutorialMessageTextField.text = 'Отлично! Посетитель ушел в хорошем настроении и наверняка зайдет еще :)\n' + 
+							'Если у тебя закончилась какая-то продукция, ты можешь купить ее в магазине.\n' + 
+							'Теперь ты знаешь все необходимое для начала работы. Набери 2 уровень!';
+					tutorialMessageTextField.visible = true;
+					tutorialGoButton.visible = true;
+					break;
+				case TUTORIAL_LEVEL2_UP:
+					tutorialMessageTextField.text = 'Некоторые виды алкогольной продукции требуют лицензии на них.\n' +
+						'Купи лецензию и сможешь приобретать этот товар в свой бар.\n\n' +
+						'Также ты можешь обустраивать свой бар, приобретая новые предметы в "Магазине интерьера".\n' +
+						'Это позволит повысить количество посетителей и их любовь к тебе.\n' + 
+						'Сделай свой бар самым красивым!';
+					tutorialMessageTextField.visible = true;
+					tutorialGoButton.visible = true;
 					break;
 			}
-			addChild(tutorialWindow);
+//			tutorialWindow.addChild(messageTextField);
 		}
 		
 		public function hideTutorial(): void {
 			tutorialWindow.visible = false;
 			tutorialArrow.visible = false;
+		}
+		
+		//-----------------------------------------------------------------------
+		//-----------------------------------------------------------------------
+		// Окна переходов между уровенями
+		//-----------------------------------------------------------------------
+		//-----------------------------------------------------------------------
+		
+		public static const UP_LEVEL_WIDTH: Number = 450;
+		public static const UP_LEVEL_HEIGHT: Number = 300;
+		public static const UP_LEVEL_TEXT_WIDTH: Number = 300;
+		public static const UP_LEVEL_TEXT_Y: Number = 30;
+		public static const UP_LEVEL_BTN_Y: Number = 250;
+		public static const UP_LEVEL_BTN_WIDTH: Number = 100;
+		public static const UP_LEVEL_BTN_HEIGHT: Number = 30;
+		public static const UP_LEVEL_GOODS_Y: Number = 100;
+		public static const UP_LEVEL_PRODUCTION_Y: Number = 200;
+		public static const UP_LEVEL_BETWEEN_PANELS: Number = 15;
+		public var upLevelWindow: Window;
+		public var upLevelGoButton: GameObject;
+		public var upLevelMessageTextField: TextField;
+		public var upLevel: Number;
+		public var upLevelProduction: Array;
+		public var upLevelGoods: Array;
+		
+		public function showUpLevel(level: Number): void {
+			upLevel = level;
+			if (!upLevelWindow) {
+				upLevelWindow = new Window(scene, UP_LEVEL_WIDTH, UP_LEVEL_HEIGHT);
+				upLevelWindow.zOrder = UP_LEVEL_WINDOW_Z_ORDER;
+				upLevelWindow.x = (Bar.WIDTH - upLevelWindow.width) / 2;
+				upLevelWindow.y = (Bar.HEIGHT - upLevelWindow.height) / 2;
+				addChild(upLevelWindow);
+			}
+			upLevelWindow.visible = true;
+			tutorialArrow.visible = false;
+			if (!upLevelGoButton) {
+				upLevelGoButton = new GameObject(scene);
+				upLevelGoButton.x = (UP_LEVEL_WIDTH - UP_LEVEL_BTN_WIDTH) / 2;
+				upLevelGoButton.y = TUTORIAL_BTN_Y;
+				upLevelGoButton.width = UP_LEVEL_BTN_WIDTH;
+				upLevelGoButton.height = UP_LEVEL_BTN_HEIGHT;
+				upLevelGoButton.setSelect(true);
+				upLevelGoButton.bitmap = new Bitmap(new BitmapData(UP_LEVEL_BTN_WIDTH, UP_LEVEL_BTN_HEIGHT, false, 0xff0000));
+				var btf: TextField = new TextField();
+				btf.width = 200;
+				btf.autoSize = TextFieldAutoSize.LEFT;
+				btf.text = 'Играть!';
+				upLevelGoButton.setTextField(btf, View.ALIGN_HOR_CENTER | View.ALIGN_VER_CENTER);
+				upLevelWindow.addChild(upLevelGoButton);
+				upLevelGoButton.addEventListener(GameObjectEvent.TYPE_MOUSE_CLICK, function (event: GameObjectEvent): void {
+					hideUpLevel();
+				});
+			}
+			upLevelGoButton.visible = false;
+			if (!upLevelMessageTextField) {
+				upLevelMessageTextField = new TextField();
+				upLevelMessageTextField.width = UP_LEVEL_TEXT_WIDTH;
+				upLevelMessageTextField.wordWrap = true;
+				upLevelMessageTextField.selectable = false;
+				upLevelMessageTextField.autoSize = TextFieldAutoSize.CENTER;
+				upLevelMessageTextField.x = (upLevelWindow.width - upLevelMessageTextField.width) / 2;
+				upLevelMessageTextField.y = TUTORIAL_TEXT_Y;
+				upLevelWindow.addChild(upLevelMessageTextField);
+			}
+			upLevelMessageTextField.text = 'Поздравляем! Теперь посетители могут заказать новые коктейли и напитки!\n' +
+				'А в магазине ты сможешь купить новую продукцию.';
+			upLevelMessageTextField.visible = true;
+			if (!upLevelProduction) {
+				upLevelProduction = new Array();
+			}
+			else {
+				for each (pp in upLevelProduction) {
+					if (upLevelWindow.contains(pp)) {
+						upLevelWindow.removeChild(pp);
+						upLevelProduction.splice(upLevelProduction.indexOf(pp), 1);
+					}
+				}
+			}
+			for each (var pt: ProductionType in Balance.productionTypes) {
+				if (upLevel == pt.accessLevel) {
+					upLevelProduction.push(new ProductionPanel(scene, pt, null));
+				}
+			}
+			var xx: Number = (UP_LEVEL_WIDTH - (upLevelProduction.length * ProductionPanel.WIDTH + (upLevelProduction.length - 1) * UP_LEVEL_BETWEEN_PANELS)) / 2;
+			for each (var pp: ProductionPanel in upLevelProduction) {
+				pp.x = xx;
+				pp.y = UP_LEVEL_PRODUCTION_Y; 
+				pp.enabled = true;
+				pp.licensed = true;
+				xx += ProductionPanel.WIDTH + UP_LEVEL_BETWEEN_PANELS;
+				upLevelWindow.addChild(pp);
+			}
+			if (!upLevelGoods) {
+				upLevelGoods = new Array();
+			}
+			else {
+				for each (gp in upLevelGoods) {
+					if (upLevelWindow.contains(gp)) {
+						upLevelWindow.removeChild(gp);
+						upLevelGoods.splice(upLevelGoods.indexOf(gp), 1);
+					}
+				}
+			}
+			for each (var gt: GoodsType in Balance.goodsTypes) {
+				if (upLevel == gt.accessLevel) {
+					upLevelGoods.push(new GoodsPanel(scene, gt, null));
+				}
+			}
+			xx = (UP_LEVEL_WIDTH - (upLevelGoods.length * GoodsPanel.WIDTH + (upLevelGoods.length - 1) * UP_LEVEL_BETWEEN_PANELS)) / 2;
+			for each (var gp: GoodsPanel in upLevelGoods) {
+				gp.x = xx;
+				gp.y = UP_LEVEL_GOODS_Y; 
+				gp.enabled = true;
+				xx += GoodsPanel.WIDTH + UP_LEVEL_BETWEEN_PANELS;
+				upLevelWindow.addChild(gp);
+			}
+		}
+		
+		public function hideUpLevel(): void {
+			upLevelWindow.visible = false;
 		}
 	}
 }

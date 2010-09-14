@@ -151,7 +151,9 @@ package com.bar.ui.panels
 		}
 		
 		protected function licenseButtonClick(event: GameObjectEvent): void {
-			mainMenu.onLicenseButtonClick(productionType);
+			if (mainMenu) {
+				mainMenu.onLicenseButtonClick(productionType);
+			}
 		}
 	}
 }

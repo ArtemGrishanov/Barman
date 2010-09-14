@@ -20,7 +20,9 @@ package {
 		public static var viewer_id: String = '9028622';
 		public static var fullName: String = 'Артем Гришанов';
 		public static var photoPath: String = 'http://cs295.vkontakte.ru/u9028622/a_f6aef0ce.jpg';
-		public static const host: String = '127.0.0.1';
+//		public static const host: String = '127.0.0.1';
+//		public static const port: int = 1139;
+		public static const host: String = '81.177.33.114';
 		public static const port: int = 1139;
 		public static const vk_id: String = '9028622';
 		public static const password: String = 'password';

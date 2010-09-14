@@ -115,7 +115,11 @@ package com.bar.model
 		 */
 		public static function initClientTypes(): void {
 			clientTypes = new Array();
-			clientTypes.push(new ClientType('man-kachok', ClientType.MALE, -97, -231, new Bitmap(new BitmapData(50, 50, false, 0xdede44))));
+			clientTypes.push(new ClientType('blond_in_red', ClientType.FEMALE, -97, -231, new Bitmap(new BitmapData(50, 50, false, 0xdede44))));
+			clientTypes.push(new ClientType('teenager', ClientType.MALE, -97, -231, new Bitmap(new BitmapData(30, 50, false, 0xffd004))));
+			clientTypes.push(new ClientType('violet_girl', ClientType.FEMALE, -97, -231, new Bitmap(new BitmapData(50, 50, false, 0xdede44))));
+			clientTypes.push(new ClientType('geek', ClientType.MALE, -97, -231, new Bitmap(new BitmapData(30, 50, false, 0xffd004))));
+			clientTypes.push(new ClientType('man_kachok', ClientType.MALE, -97, -231, new Bitmap(new BitmapData(50, 50, false, 0xdede44))));
 			clientTypes.push(new ClientType('sexy-blond', ClientType.FEMALE, -97, -231, new Bitmap(new BitmapData(30, 50, false, 0xffd004))));
 		}
 		

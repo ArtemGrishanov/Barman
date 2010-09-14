@@ -140,6 +140,10 @@ package com.bar.model
 		public var tipMoneyCent: Number;
 		public var tipMoneyEuro: Number;
 		public var clientId: Number;
+		/**
+		 * Признак того, что был обслужен первый клиент 
+		 */
+		public var firstClientServed: Boolean;
 		
 		public function CoreEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false)
 		{

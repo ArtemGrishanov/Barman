@@ -46,9 +46,10 @@ package com.bar.ui
 			client = c;
 			x = UIBarPlace.CLIENT_SIT_CENTER_X[c.position] + client.typeClient.dx;
 			y = UIBarPlace.CLIENT_SIT_Y + client.typeClient.dy;
-			moodClient = c.mood;
+			moodClient = client.mood;
 			id = client.id;
-			bitmap = BitmapUtil.cloneBitmap(c.typeClient.bitmap);
+			client.typeClient.bitmap.transform = 
+			bitmap = BitmapUtil.cloneBitmap(client.typeClient.bitmap);
 //			var t: TextField = new TextField();
 //			t.text = c.typeClient.type;
 //			t.autoSize = TextFieldAutoSize.LEFT;

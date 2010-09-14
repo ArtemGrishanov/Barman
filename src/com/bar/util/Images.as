@@ -8,7 +8,12 @@ package com.bar.util
 		
 		public static const BARTABLE_BACK1:String = 'http://www.fcapi.ru/images_bar/bartable_back1.png';
 		public static const BARTABLE1:String = 'http://www.fcapi.ru/images_bar/bartable1.png';
-		public static const CLIENT1:String = 'http://www.fcapi.ru/images_bar/client1.png';
+		public static const CLIENT1:String = 'http://www.fcapi.ru/images_bar/clients/client1.png';
+		public static const CLIENT2:String = 'http://www.fcapi.ru/images_bar/clients/client2.png';
+		public static const CLIENT3:String = 'http://www.fcapi.ru/images_bar/clients/client3.png';
+		public static const CLIENT4:String = 'http://www.fcapi.ru/images_bar/clients/client4.png';
+		public static const CLIENT5:String = 'http://www.fcapi.ru/images_bar/clients/client5.png';
+		public static const CLIENT6:String = 'http://www.fcapi.ru/images_bar/clients/client6.png';
 		public static const LAMP1:String = 'http://www.fcapi.ru/images_bar/lamp1.png';
 		public static const PICTURE1:String = 'http://www.fcapi.ru/images_bar/picture1.png';
 		public static const PICTURE2:String = 'http://www.fcapi.ru/images_bar/picture2.png';
@@ -16,11 +21,11 @@ package com.bar.util
 		public static const SHKAF1:String = 'http://www.fcapi.ru/images_bar/shkaf1.png';
 		public static const STUL1:String = 'http://www.fcapi.ru/images_bar/stul1.png';
 		public static const WALL1:String = 'http://www.fcapi.ru/images_bar/wall1.png';
-		public static const WOMAN_BODY:String = 'http://www.fcapi.ru/images_bar/woman_body.png';
-		public static const WOMAN_BUST1:String = 'http://www.fcapi.ru/images_bar/woman_bust1.png';
-		public static const WOMAN_PANTS1:String = 'http://www.fcapi.ru/images_bar/woman_pants1.png';
-		public static const WOMAN_SKIRT1:String = 'http://www.fcapi.ru/images_bar/woman_skirt1.png';
-		public static const WOMAN_TSHIRT1:String = 'http://www.fcapi.ru/images_bar/woman_tshirt1.png';
+		public static const WOMAN_BODY:String = 'http://www.fcapi.ru/images_bar/barman_woman/woman_body.png';
+		public static const WOMAN_BUST1:String = 'http://www.fcapi.ru/images_bar/barman_woman/woman_bust1.png';
+		public static const WOMAN_PANTS1:String = 'http://www.fcapi.ru/images_bar/barman_woman/woman_pants1.png';
+		public static const WOMAN_SKIRT1:String = 'http://www.fcapi.ru/images_bar/barman_woman/woman_skirt1.png';
+		public static const WOMAN_TSHIRT1:String = 'http://www.fcapi.ru/images_bar/barman_woman/woman_tshirt1.png';
 		
 		public static const PROD_VODKA:String = 'http://www.fcapi.ru/images_bar/prod/vodka.png';
 		public static const PROD_BEER:String = 'http://www.fcapi.ru/images_bar/prod/beer.png';
@@ -66,7 +71,6 @@ package com.bar.util
 			QUESTION_A,
 			BARTABLE_BACK1,
 			BARTABLE1,
-			CLIENT1,
 			LAMP1,
 			PICTURE1,
 			PICTURE2,
@@ -79,6 +83,13 @@ package com.bar.util
 			WOMAN_PANTS1,
 			WOMAN_SKIRT1,
 			WOMAN_TSHIRT1,
+			
+			CLIENT1,
+			CLIENT2,
+			CLIENT3,
+			CLIENT4,
+			CLIENT5,
+			CLIENT6,
 			
 			PROD_VODKA,
 			PROD_BEER,

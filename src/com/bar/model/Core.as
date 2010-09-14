@@ -52,6 +52,10 @@ package com.bar.model
 		 */
 		public var firstLaunch: Boolean;
 		/**
+		 * Обслужили ли первого клиента. Первый клиент появляется сразу и сидит один пока его не обслужат.
+		 */
+		public var firstClientServed: Boolean;
+		/**
 		 * Определяет, был ли добавлен начальный набор продукции в бар
 		 */
 		public var addedStartProduction: Boolean;
@@ -72,6 +76,7 @@ package com.bar.model
 			else {
 				// сервер не доступен - не можем наверняка определить первый это запуск или нет. Считаем что первый.
 				firstLaunch = true;
+				firstClientServed = false;
 			}
 			timer = new Timer(Balance.coreTimerPeriod, 0);
 			timer.addEventListener(TimerEvent.TIMER, onTimer);
@@ -93,10 +98,15 @@ package com.bar.model
 		public function onTimer(event: TimerEvent): void {
 			if (isLoaded) {
 				var nowTime: Number = new Date().getTime() / 1000;
-				if (myBarPlace.clients.length < Balance.maxClientsCount) {
-					//todo clientSpeed от любви и количества приглашенных.
-					if (Selector.prob(Balance.getClientComeProb(Balance.minClientSpeed))) {
-						createNewClient();
+				if (firstLaunch && !firstClientServed && myBarPlace.clients.length == 0) {
+					createNewClient();
+				}
+				if (!firstLaunch || firstClientServed) {
+					if (myBarPlace.clients.length < Balance.maxClientsCount) {
+						//todo clientSpeed от любви и количества приглашенных.
+						if (Selector.prob(Balance.getClientComeProb(Balance.minClientSpeed))) {
+							createNewClient();
+						}
 					}
 				}
 				//изменение настроения клиентов
@@ -344,6 +354,10 @@ package com.bar.model
 					var clientServedEvent: CoreEvent = new CoreEvent(CoreEvent.EVENT_CLIENT_SERVED);
 					clientServedEvent.client = servingClient;
 					clientServedEvent.goods = currentGoods;
+					if (!firstClientServed) {
+						firstClientServed = true;
+						clientServedEvent.firstClientServed = true;
+					}
 					dispatchEvent(clientServedEvent);
 					if (server) {
 						server.clientServed(servingClient.id);
@@ -687,6 +701,7 @@ package com.bar.model
 		
 		public function firstLaunched(event: ServerEvent): void {
 			firstLaunch = true;
+			firstClientServed = false;
 			if (isLoaded && !addedStartProduction) {
 				addStartProduction();
 			}
