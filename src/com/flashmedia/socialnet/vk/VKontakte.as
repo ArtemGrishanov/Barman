@@ -14,13 +14,15 @@ package com.flashmedia.socialnet.vk
 	
 	public class VKontakte extends EventDispatcher
 	{
-		private static const FC_API_SERVER:String = 'http://api.vkontakte.ru/api.php';
-		private static const APP_KEY:String = 'EqKl8Wg2be';
-		private static const APP_KEY_SAND_BOX:String = 'ZJEJl8y2Wl';
-		private static const APP_ID:String = '1827403';
-		private static const APP_ID_SAND_BOX:String = '1882789';
+		private static const API_URL:String = 'http://api.vkontakte.ru/api.php';
+		private static const APP_KEY:String = 'RzFAz8tjti';
+		private static const APP_PRIVATE_KEY:String = 'Sf3jPCp8bdmwlsOtGlqL';
+		private static const APP_KEY_SAND_BOX:String = 'zzzzzz';
+		private static const APP_ID:String = '1955775';
+		private static const APP_ID_SAND_BOX:String = '100000';
 		
-		public static var apiUrl:String = FC_API_SERVER;
+		public static var testMode: uint = 1;
+		public static var apiUrl:String = API_URL;
 //		public static var appId:String = APP_ID_SAND_BOX;
 //		public static var appKey:String = APP_KEY_SAND_BOX;
 		public static var appId:String = APP_ID;
@@ -28,7 +30,6 @@ package com.flashmedia.socialnet.vk
 		
 		private const loader:URLLoader = new URLLoader();
 		
-		public var testMode:uint = 0;
 		private var requestQueue: Array;
 		private var timer: Timer;
 		private var currentMethod: String;

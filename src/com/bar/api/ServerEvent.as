@@ -9,7 +9,7 @@ package com.bar.api
 	 */
 	public class ServerEvent extends Event
 	{
-		public static const EVENT_FIRST_LAUNCH: String = 'first_launch';
+//		public static const EVENT_FIRST_LAUNCH: String = 'first_launch';
 		/**
 		 * Ошибка сервера, соединения и т.п.
 		 */
@@ -29,7 +29,8 @@ package com.bar.api
 		public static const EVENT_USER_MONEY_CENT_CHANGED: String = 'user_money_cent_changed';
 		public static const EVENT_USER_MONEY_EURO_CHANGED: String = 'user_money_euro_changed';
 		/**
-		 * Загружены друзья пользователя
+		 * Загружены друзья пользователя, которые зарегистрированы в игре.
+		 * Возвращается список ид друзей, которые есть в игре.
 		 */
 		public static const EVENT_FRIENDS_LOADED: String = 'friends_loaded';
 		/**
@@ -65,6 +66,22 @@ package com.bar.api
 		public var exp: Number;
 		public var level: Number;
 		public var love: Number;
+		/**
+		 * Идишники друзей, которые в игре
+		 */
+		public var friendsIds: Array;
+		/**
+		 * Уровни друзей, которые в игре. Параллельный с friendsIds.
+		 */
+		public var friendsLevels: Array;
+		/**
+		 * Опыт друзей, которые в игре. Параллельный с friendsIds.
+		 */
+		public var friendsExp: Array;
+		/**
+		 * Признак первого запуска.
+		 */
+		public var firstLaunch: Boolean;
 		
 		public function ServerEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false)
 		{

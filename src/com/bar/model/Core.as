@@ -9,6 +9,7 @@ package com.bar.model
 	import com.bar.model.essences.GoodsType;
 	import com.bar.model.essences.Production;
 	import com.bar.model.essences.ProductionType;
+	import com.bar.modeltests.LevelStatistics;
 	import com.util.Selector;
 	
 	import flash.events.EventDispatcher;
@@ -55,15 +56,15 @@ package com.bar.model
 		 * Обслужили ли первого клиента. Первый клиент появляется сразу и сидит один пока его не обслужат.
 		 */
 		public var firstClientServed: Boolean;
-		/**
-		 * Определяет, был ли добавлен начальный набор продукции в бар
-		 */
-		public var addedStartProduction: Boolean;
+//		/**
+//		 * Определяет, был ли добавлен начальный набор продукции в бар
+//		 */
+//		public var addedStartProduction: Boolean;
 		
 		public function Core(viewerId: String, fullName: String, photoPath: String, srv: Server)
 		{
 			isLoaded = false;
-			addedStartProduction = false;
+//			addedStartProduction = false;
 			myBarPlace = new BarPlace(new User(viewerId, fullName));
 			myBarPlace.user.photoPath = photoPath;
 			server = srv;
@@ -71,7 +72,7 @@ package com.bar.model
 				// если что, то сервер пришлет уведомление, что запуск первый
 				firstLaunch = false;
 				server.addEventListener(ServerEvent.EVENT_BAR_LOADED, barLoaded);
-				server.addEventListener(ServerEvent.EVENT_FIRST_LAUNCH, firstLaunched);
+//				server.addEventListener(ServerEvent.EVENT_FIRST_LAUNCH, firstLaunched);
 			}
 			else {
 				// сервер не доступен - не можем наверняка определить первый это запуск или нет. Считаем что первый.
@@ -144,48 +145,14 @@ package com.bar.model
 		 * Загрузить бар пользователя c сервера
 		 */
 		public function loadBar(id_user: String): void {
+			//todo выдача бонусных денег и любви, за каждодневное посещение
 			if (server) {
 				server.loadBar(id_user);
 			}
 			else {
 				var barLoadEvent: CoreEvent = new CoreEvent(CoreEvent.EVENT_BAR_LOADED);
 				if (id_user == myBarPlace.user.id_user) {
-					//todo выдача бонусных денег и любви, за каждодневное посещение
-					myBarPlace.user.experience = 0;
-					myBarPlace.user.level = Balance.startLevel;
-					myBarPlace.user.love = Balance.startLove;
-					myBarPlace.user.invites = 0;
-					myBarPlace.user.moneyCent = Balance.startMoneyCent;
-					myBarPlace.user.moneyEuro = Balance.startMoneyEuro;
-					myBarPlace.user.photo = null;
-					//myBarPlace.user.licensedProdTypes.push('vodka');
-					myBarPlace.production = new Array();
-					myBarPlace.production.push(new Production(productionTypes[0] as ProductionType));
-					myBarPlace.production.push(new Production(productionTypes[0] as ProductionType));
-					myBarPlace.production.push(new Production(productionTypes[0] as ProductionType));
-					myBarPlace.production.push(new Production(productionTypes[1] as ProductionType));
-					myBarPlace.production.push(new Production(productionTypes[2] as ProductionType));
-					myBarPlace.production.push(new Production(productionTypes[3] as ProductionType));
-					myBarPlace.production.push(new Production(productionTypes[3] as ProductionType));
-					
-					myBarPlace.decor = new Array();
-					myBarPlace.decor.push(new Decor(decorTypes[0] as DecorType));
-					myBarPlace.decor.push(new Decor(decorTypes[1] as DecorType));
-					myBarPlace.decor.push(new Decor(decorTypes[2] as DecorType));
-					myBarPlace.decor.push(new Decor(decorTypes[3] as DecorType));
-					myBarPlace.decor.push(new Decor(decorTypes[4] as DecorType));
-					myBarPlace.decor.push(new Decor(decorTypes[5] as DecorType));
-					myBarPlace.decor.push(new Decor(decorTypes[6] as DecorType));
-					myBarPlace.decor.push(new Decor(decorTypes[7] as DecorType));
-					myBarPlace.decor.push(new Decor(decorTypes[8] as DecorType));
-					myBarPlace.decor.push(new Decor(decorTypes[9] as DecorType));
-					myBarPlace.decor.push(new Decor(decorTypes[10] as DecorType));
-					myBarPlace.decor.push(new Decor(decorTypes[11] as DecorType));
-					myBarPlace.decor.push(new Decor(decorTypes[12] as DecorType));
-					myBarPlace.decor.push(new Decor(decorTypes[13] as DecorType));
-					myBarPlace.decor.push(new Decor(decorTypes[14] as DecorType));
-					myBarPlace.decor.push(new Decor(decorTypes[15] as DecorType));
-					
+					initStartParams();
 					barLoadEvent.barPlace = myBarPlace;
 				}
 				else {
@@ -446,13 +413,30 @@ package com.bar.model
 		/**
 		 * Добавить начальный набор продукции в бар
 		 */
-		public function addStartProduction(): void {
-			addedStartProduction = true;
+		public function initStartParams(): void {
+//			addedStartProduction = true;
+			
+			myBarPlace.user.experience = 0;
+			myBarPlace.user.level = Balance.startLevel;
+			myBarPlace.user.love = Balance.startLove;
+			myBarPlace.user.invites = 0;
+			myBarPlace.user.photo = null;
+
+			if (server) {
+				server.userAttrsChanged(myBarPlace.user.level, myBarPlace.user.experience, myBarPlace.user.love);
+			}
+			changeUserMoney(Balance.startMoneyCent, Balance.startMoneyEuro);
 			myBarPlace.production = Balance.getStartProduction();
 			for each (var p: Production in myBarPlace.production) {
 				if (server) {
 					server.productionAddedToBar(p.id, p.typeProduction.type, p.partsCount, p.cellIndex, p.rowIndex);
-				}	
+				}
+			}
+			myBarPlace.decor = Balance.getStartDecor();
+			for each (var d: Decor in myBarPlace.decor) {
+				if (server) {
+					server.decorAddedToBar(d.id, d.typeDecor.type);
+				}
 			}
 		}
 		
@@ -546,6 +530,10 @@ package com.bar.model
 				for each (var decor: Decor in myBarPlace.decor) {
 					if ((decor.typeDecor.type != typeDecor.type) && (decor.typeDecor.category == typeDecor.category)) {
 						myBarPlace.decor.splice(myBarPlace.decor.indexOf(decor), 1);
+						//TODO удаление декора с сервера
+						if (server) {
+							server.decorDeleted(decor.id);
+						}
 					}
 				}
 				var d: Decor = new Decor(typeDecor);
@@ -591,7 +579,7 @@ package com.bar.model
 		 * Это и прибыль с продаж и донат, и, наоборот, покупки в магазине.
 		 */
 		public function changeUserMoney(moneyCentDelta: Number, moneyEuroDelta: Number): void {
-			if (moneyCentDelta != 0) {
+			if (moneyCentDelta && moneyCentDelta != 0) {
 				var eventUserMoneyCentChanged: CoreEvent = new CoreEvent(CoreEvent.EVENT_USER_MONEY_CENT_CHANGED);
 				eventUserMoneyCentChanged.oldMoneyCent = myBarPlace.user.moneyCent;
 				myBarPlace.user.moneyCent += moneyCentDelta;
@@ -601,7 +589,7 @@ package com.bar.model
 					server.moneyCentChanged(myBarPlace.user.moneyCent);
 				}
 			}
-			if (moneyEuroDelta != 0) {
+			if (moneyEuroDelta && moneyEuroDelta != 0) {
 				var eventUserMoneyEuroChanged: CoreEvent = new CoreEvent(CoreEvent.EVENT_USER_MONEY_EURO_CHANGED);
 				eventUserMoneyEuroChanged.oldMoneyEuro = myBarPlace.user.moneyEuro;
 				myBarPlace.user.moneyEuro += moneyEuroDelta;
@@ -672,25 +660,33 @@ package com.bar.model
 		public function barLoaded(event: ServerEvent): void {
 			var barLoadEvent: CoreEvent = new CoreEvent(CoreEvent.EVENT_BAR_LOADED);
 			if (event.barPlace.user.id_user == myBarPlace.user.id_user) {
-				//todo выдача бонусных денег и любви, за каждодневное посещение
-				myBarPlace.user.experience = (event.barPlace.user.experience >= 0) ? event.barPlace.user.experience : Balance.startExperience;
-				myBarPlace.user.level = (event.barPlace.user.level >= 0) ? event.barPlace.user.level : Balance.startLevel;
-				myBarPlace.user.love = (event.barPlace.user.love >= 0) ? event.barPlace.user.love : Balance.startLove;
-				myBarPlace.user.invites = (event.barPlace.user.invites >= 0) ? event.barPlace.user.invites : 0;
-				myBarPlace.user.moneyCent = (event.barPlace.user.moneyCent >= 0) ? event.barPlace.user.moneyCent : Balance.startMoneyCent;
-				myBarPlace.user.moneyEuro = (event.barPlace.user.moneyEuro >= 0) ? event.barPlace.user.moneyEuro : Balance.startMoneyEuro;
-				//todo загрузка фото можно сделать отдельным событием, загрузка начинается здесь
-				myBarPlace.user.photo = null;
-				myBarPlace.clients = event.barPlace.clients;
-				myBarPlace.decor = event.barPlace.decor;
-				myBarPlace.production = event.barPlace.production;
-				myBarPlace.user.licensedProdTypes = event.barPlace.user.licensedProdTypes;
-				
+				// делать только один раз, а не когда грузим бар
+				server.sendVKAttrs(myBarPlace.user.fullName, myBarPlace.user.photoPath);
+				if (event.firstLaunch) {
+					firstLaunch = true;
+					firstClientServed = false;
+					initStartParams();
+				}
+				else {
+					//todo выдача бонусных денег и любви, за каждодневное посещение
+					myBarPlace.user.experience = (event.barPlace.user.experience >= 0) ? event.barPlace.user.experience : Balance.startExperience;
+					myBarPlace.user.level = (event.barPlace.user.level > 0) ? event.barPlace.user.level : Balance.startLevel;
+					myBarPlace.user.love = (event.barPlace.user.love > 0) ? event.barPlace.user.love : Balance.startLove;
+					myBarPlace.user.invites = (event.barPlace.user.invites > 0) ? event.barPlace.user.invites : 0;
+					myBarPlace.user.moneyCent = (event.barPlace.user.moneyCent >= 0) ? event.barPlace.user.moneyCent : Balance.startMoneyCent;
+					myBarPlace.user.moneyEuro = (event.barPlace.user.moneyEuro >= 0) ? event.barPlace.user.moneyEuro : Balance.startMoneyEuro;
+					//todo загрузка фото можно сделать отдельным событием, загрузка начинается здесь
+					myBarPlace.user.photo = null;
+					myBarPlace.clients = event.barPlace.clients;
+					myBarPlace.decor = event.barPlace.decor;
+					myBarPlace.production = event.barPlace.production;
+					myBarPlace.user.licensedProdTypes = event.barPlace.user.licensedProdTypes;
+				}
 				barLoadEvent.barPlace = myBarPlace;
 				isLoaded = true;
-				if (firstLaunch && !addedStartProduction) {
-					addStartProduction();
-				}
+//				if (firstLaunch && !addedStartProduction) {
+//					initStartParams();
+//				}
 			}
 			else {
 				//userBarPlace = new BarPlace(new User('57856825', 'Али Гаджиев', 1, 1, 100, 0, 500, 3, null, null));
@@ -699,13 +695,13 @@ package com.bar.model
 			dispatchEvent(barLoadEvent);
 		}
 		
-		public function firstLaunched(event: ServerEvent): void {
-			firstLaunch = true;
-			firstClientServed = false;
-			if (isLoaded && !addedStartProduction) {
-				addStartProduction();
-			}
-			server.sendVKAttrs(myBarPlace.user.fullName, myBarPlace.user.photoPath);
-		}
+//		public function firstLaunched(event: ServerEvent): void {
+//			firstLaunch = true;
+//			firstClientServed = false;
+//			if (isLoaded && !addedStartProduction) {
+//				initStartParams();
+//			}
+//			server.sendVKAttrs(myBarPlace.user.fullName, myBarPlace.user.photoPath);
+//		}
 	}
 }

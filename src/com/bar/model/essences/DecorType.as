@@ -32,7 +32,8 @@ package com.bar.model.essences
 		 */
 		private var _bitmap: Bitmap;
 		/**
-		 * Иконка, которая показывается в магазине
+		 * Иконка, которая показывается в магазине.
+		 * Если иконка не задана, декор не показывается в магазине.
 		 */
 		public var bitmapSmall: Bitmap;
 		
@@ -69,7 +70,7 @@ package com.bar.model.essences
 		
 		public function set bitmap(value: Bitmap): void {
 			_bitmap = value;
-			bitmapSmall = BitmapUtil.scaleImageWidthHeight(_bitmap, 30, 30, true);
+			//bitmapSmall = BitmapUtil.scaleImageWidthHeight(_bitmap, 30, 30, true);
 		}
 		
 		public function get bitmap(): Bitmap {

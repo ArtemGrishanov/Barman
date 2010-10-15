@@ -4,6 +4,7 @@ package com.bar.ui.panels
 	import com.bar.model.essences.GoodsType;
 	import com.bar.model.essences.Production;
 	import com.bar.model.essences.ProductionType;
+	import com.bar.util.Images;
 	import com.flashmedia.basics.GameLayer;
 	import com.flashmedia.basics.GameObject;
 	import com.flashmedia.basics.GameObjectEvent;
@@ -13,26 +14,27 @@ package com.bar.ui.panels
 	import com.flashmedia.util.BitmapUtil;
 	
 	import flash.display.Bitmap;
-	import flash.display.BitmapData;
 	import flash.display.Sprite;
 	import flash.filters.ColorMatrixFilter;
+	import flash.filters.GlowFilter;
+	import flash.geom.Rectangle;
 	
 	public class ClientOrderPanel extends GameLayer
 	{
-		public static const WIDTH: Number = 150;
+		public static const WIDTH: Number = 210;
 		public static const HEIGHT: Number = 200;
 		public static const GOODS_X: Number = 10;
-		public static const GOODS_Y_TOP_INDENT: Number = 8;
+		public static const GOODS_Y_TOP_INDENT: Number = 7;
 		public static const PROD_MAX_HEIGHT: Number = 65;
 		public static const PROD_X_INDENT: Number = 7;
-		public static const PROD_Y_TOP_INDENT: Number = 20;
+		public static const PROD_Y_TOP_INDENT: Number = 14;
 		public static const PROD_Y_BOTTOM_INDENT: Number = 10;
 		
 		public var cancelButton: GameObject;
 		public var goodsGameObject: GameObject;
 		public var goodsGameObjectGray: GameObject;
 		public var prodGameObjects: Array;
-		public var clientGameObject: GameObject;
+//		public var clientGameObject: GameObject;
 		public var goodsComponentsCount: int;
 		public var wipeAction: Wipe;
 		public var lastAddedProduction: Production;
@@ -40,7 +42,14 @@ package com.bar.ui.panels
 		public function ClientOrderPanel(value: GameScene)
 		{
 			super(value);
-			cancelButton = createRoundButton(new Bitmap(new BitmapData(20, 20, false, 0xff1122)));
+			width = WIDTH;
+			height = HEIGHT;
+			bitmap = BitmapUtil.scaleWith9Grid(Bar.multiLoader.get(Images.WINDOW),
+											new Rectangle(50, 50, 490, 400),
+											width, height);
+			cancelButton = createRoundButton(BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.BTN_CLOSE)));
+			cancelButton.x = width - cancelButton.width / 2;
+			cancelButton.y = -cancelButton.height / 2;
 			cancelButton.addEventListener(GameObjectEvent.TYPE_MOUSE_CLICK, onCancelBtnClick);
 			addChild(cancelButton);
 			visible = false;
@@ -66,7 +75,9 @@ package com.bar.ui.panels
 			}
 		}
 
-		public function showGoods(goodsType: GoodsType, clientGO: GameObject): void {
+		public function showGoods(goodsType: GoodsType, xx: Number, yy: Number): void {
+			x = xx;
+			y = yy;
 			if (goodsGameObject && contains(goodsGameObject)) {
 				removeChild(goodsGameObject);
 			}
@@ -76,7 +87,7 @@ package com.bar.ui.panels
 			goodsComponentsCount = goodsType.composition.length;
 			width = WIDTH;
 			height = HEIGHT;
-			clientGameObject = clientGO;
+//			clientGameObject = clientGO;
 			if (prodGameObjects) {
 				for each (var g: GameObject in prodGameObjects) {
 					if (contains(g)) {
@@ -106,7 +117,8 @@ package com.bar.ui.panels
 				addChild(prodGO);
 			}
 			updateProductionX();
-			updateLayer();
+//			x = clientGameObject.x + (clientGameObject.width - width) / 2;
+//			y = clientGameObject.y + (clientGameObject.height - height) / 2;
 			goodsGameObject.x = (width - goodsGameObject.width) / 2;
 			for each(var go: GameObject in prodGameObjects) {
 				go.y = yy + PROD_MAX_HEIGHT - go.height;
@@ -130,17 +142,6 @@ package com.bar.ui.panels
 			yy += goodsGameObjectGray.height + PROD_Y_TOP_INDENT;
 			goodsGameObjectGray.x = (width - goodsGameObjectGray.width) / 2;
 			visible = true;
-		}
-		
-		private function updateLayer(): void {
-			x = clientGameObject.x + (clientGameObject.width - width) / 2;
-			y = clientGameObject.y + (clientGameObject.height - height) / 2;
-			graphics.clear();
-			graphics.beginFill(0x1111dd, 0.8);
-			graphics.drawRoundRect(0, 0, width, height, 10, 10);
-			graphics.endFill();
-			cancelButton.x = width - cancelButton.width / 2;
-			cancelButton.y = -cancelButton.height / 2;
 		}
 		
 		private function updateProductionX(): void {
@@ -173,6 +174,8 @@ package com.bar.ui.panels
 			btn.addEventListener(GameObjectEvent.TYPE_LOST_HOVER, onButtonLostHover);
 			btn.addEventListener(GameObjectEvent.TYPE_MOUSE_DOWN, onButtonDown);
 			btn.addEventListener(GameObjectEvent.TYPE_MOUSE_UP, onButtonUp);
+			btn.addEventListener(GameObjectEvent.TYPE_SET_HOVER, onItemSetHover);
+			btn.addEventListener(GameObjectEvent.TYPE_LOST_HOVER, onItemLostHover);
 			return btn;
 		}
 		
@@ -181,11 +184,19 @@ package com.bar.ui.panels
 		}
 		
 		public function onButtonDown(event: GameObjectEvent): void {
-			event.gameObject.y += 2;
+//			event.gameObject.y += 2;
 		}
 		
 		public function onButtonUp(event: GameObjectEvent): void {
-			event.gameObject.y -= 2;
+//			event.gameObject.y -= 2;
+		}
+		
+		public function onItemSetHover(event: GameObjectEvent): void {
+			event.gameObject.applyFilter(new GlowFilter(0xffffff, 1, 10, 10));
+		}
+		
+		public function onItemLostHover(event: GameObjectEvent): void {
+			event.gameObject.removeFilter(GlowFilter);
 		}
 		
 		private function actionEnded(event: ActionEvent): void {

@@ -44,6 +44,8 @@ package com.bar.api
                 
                 public static const C_PRODUCTION_CHANGE_PLACE:int=0x29;
                 
+                public static const C_WITHDRAW_VOTES:int=0x30;
+                
                 // server generated messages
                 
                 public static const S_FIRST_LAUNCH:int=0x50;
@@ -71,6 +73,8 @@ package com.bar.api
                 public static const S_BAR_CATALOG_LOADED:int=0x61;
                 
                 public static const S_BAR_LOADED:int=0x62;
+                
+                public static const S_WITHDRAW_VOTES:int=0x63;
         }
 }
 

@@ -1,60 +1,59 @@
 package com.bar.ui.panels
 {
 	import com.bar.model.essences.DecorType;
+	import com.bar.util.Images;
 	import com.flashmedia.basics.GameLayer;
-	import com.flashmedia.basics.GameObject;
-	import com.flashmedia.basics.GameObjectEvent;
 	import com.flashmedia.basics.GameScene;
 	import com.flashmedia.util.BitmapUtil;
 	
 	import flash.display.Bitmap;
-	import flash.display.BitmapData;
-	import flash.display.Sprite;
+	import flash.events.MouseEvent;
+	import flash.filters.GlowFilter;
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
+	import flash.text.TextFormat;
 
 	public class DecorPanel extends GameLayer
 	{
-		public static const WIDTH: Number = 70;
-		public static const HEIGHT: Number = 70;
+		public static const WIDTH: Number = 130;
+		public static const HEIGHT: Number = 60;
+
+		public static const NAME_TF_X: Number = 37;
+		public static const NAME_TF_CENTER_Y: Number = 8;
+		public static const LOVE_TF_X: Number = 54;
+		public static const LOVE_TF_CENTER_Y: Number = 43;
+		public static const PRICE_TF_X: Number = 54;
+		public static const PRICE_TF_CENTER_Y: Number = 27;
+		public static const LEVEL_TF_X: Number = 103;
+		public static const LEVEL_TF_CENTER_Y: Number = 27;
+		public static const TIPS_TF_X: Number = 103;
+		public static const TIPS_TF_CENTER_Y: Number = 43;
 		
-		public static const NAME_TF_Y: Number = 2;
-		public static const LEVEL_TF_Y: Number = 55;
-		public static const EXP_TF_X: Number = 50;
-		public static const EXP_TF_Y: Number = 14;
-		public static const LOVE_TF_X: Number = 50;
-		public static const LOVE_TF_Y: Number = 28;
-		public static const TIPPROB_TF_X: Number = 50;
-		public static const TIPPROB_TF_Y: Number = 42;
-		public static const PRICE_TF_X: Number = 50;
-		public static const PRICE_TF_Y: Number = 56;
-		
-		public static const DECOR_CENTER_X: Number = 23;
-		public static const DECOR_CENTER_Y: Number = 40;
-		public static const LOVE_ICON_X: Number = 44;
-		public static const LOVE_ICON_Y: Number = 28;
-		public static const TIPPROB_ICON_X: Number = 44;
-		public static const TIPPROB_ICON_Y: Number = 42;
-		public static const MONEY_ICON_X: Number = 44;
-		public static const MONEY_ICON_Y: Number = 56;
-		public static const EXP_ICON_X: Number = 44;
-		public static const EXP_ICON_Y: Number = 14;
+		public static const DECICO_CENTER_X: Number = 20;
+		public static const DECICO_CENTER_Y: Number = 32;
+		public static const LOVE_ICON_CENTER_X: Number = 46;
+		public static const LOVE_ICON_CENTER_Y: Number = 45;
+		public static const MONEY_ICON_CENTER_X: Number = 46;
+		public static const MONEY_ICON_CENTER_Y: Number = 27;
+		public static const LEVEL_ICON_CENTER_X: Number = 95;
+		public static const LEVEL_ICON_CENTER_Y: Number = 27;
+		public static const TIPS_ICON_CENTER_X: Number = 92;
+		public static const TIPS_ICON_CENTER_Y: Number = 45;
 		
 		public var decorType: DecorType;
 		private var nameTf: TextField;
-		private var levelTf: TextField;
-		private var expTf: TextField;
 		private var loveTf: TextField;
-		private var tipProbTf: TextField;
 		private var priceTf: TextField;
+		private var levelTf: TextField;
+		private var tipsTf: TextField;
 		
-		private var levelBitmap: Bitmap;
-		private var moneyBitmap: Bitmap;
-		private var expBitmap: Bitmap;
 		private var loveBitmap: Bitmap;
-		private var tipProbBitmap: Bitmap;
+		private var moneyBitmap: Bitmap;
+		private var levelBitmap: Bitmap;
+		private var tipsBitmap: Bitmap;
 		private var decorBitmap: Bitmap;
-		private var enabledSprite: Sprite;
+		
+		private var enabled: Boolean;
 		
 		private var mainMenu: MainMenuPanel;
 		
@@ -65,97 +64,126 @@ package com.bar.ui.panels
 			height = HEIGHT;
 			this.decorType = decorType;
 			mainMenu = menu;
+			setHover(false, false);
 			
-			//todo fix
-			graphics.beginFill(0xfda952, 1.0);
-			graphics.drawRoundRect(0, 0, width, height, 8, 8);
-			graphics.endFill();
+			bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.SHOP_PANEL));
+			enabled = true;
 			
-			decorBitmap = BitmapUtil.cloneBitmap(decorType.bitmapSmall);
-			decorBitmap.x = DECOR_CENTER_X - decorBitmap.width / 2;
-			decorBitmap.y = DECOR_CENTER_Y - decorBitmap.height / 2;
-			addChild(decorBitmap);
+			if (decorType.bitmapSmall) {
+	    		decorBitmap = decorType.bitmapSmall;
+				decorBitmap.x = DECICO_CENTER_X - decorBitmap.width / 2;
+				decorBitmap.y = DECICO_CENTER_Y - decorBitmap.height / 2;
+				addChild(decorBitmap);
+			}
 			
-			expTf = new TextField();
-			expTf.text = decorType.expCount.toString();
-			expTf.autoSize = TextFieldAutoSize.LEFT;
-			expTf.x = EXP_TF_X;
-			expTf.y = EXP_TF_Y;
-			addChild(expTf);
-			expBitmap = new Bitmap(new BitmapData(10, 10, false, 0x2a2aff));
-			expBitmap.x = EXP_ICON_X;
-			expBitmap.y = EXP_ICON_Y;
-			addChild(expBitmap);
+			nameTf = new TextField();
+			nameTf.selectable = false;
+			nameTf.defaultTextFormat = new TextFormat("Arial", 10, 0xffffff);
+			nameTf.text = decorType.name;
+			nameTf.autoSize = TextFieldAutoSize.LEFT;
+			nameTf.x = NAME_TF_X;
+			nameTf.y = NAME_TF_CENTER_Y - nameTf.height / 2;
+			addChild(nameTf);
 			
 			loveTf = new TextField();
-			loveTf.text = decorType.expCount.toString();
+			loveTf.selectable = false;
+			loveTf.defaultTextFormat = new TextFormat("Arial", 10, 0xffffff);
+			loveTf.text = decorType.loveCount.toString();
 			loveTf.autoSize = TextFieldAutoSize.LEFT;
 			loveTf.x = LOVE_TF_X;
-			loveTf.y = LOVE_TF_Y;
+			loveTf.y = LOVE_TF_CENTER_Y - loveTf.height / 2;
 			addChild(loveTf);
-			loveBitmap = new Bitmap(new BitmapData(10, 10, false, 0xaa1111));
-			loveBitmap.x = LOVE_ICON_X;
-			loveBitmap.y = LOVE_ICON_Y;
-			addChild(loveBitmap);
 			
-			tipProbTf = new TextField();
-			tipProbTf.text = decorType.expCount.toString();
-			tipProbTf.autoSize = TextFieldAutoSize.LEFT;
-			tipProbTf.x = TIPPROB_TF_X;
-			tipProbTf.y = TIPPROB_TF_Y;
-			addChild(tipProbTf);
-			tipProbBitmap = new Bitmap(new BitmapData(10, 10, false, 0x2aa32a));
-			tipProbBitmap.x = TIPPROB_ICON_X;
-			tipProbBitmap.y = TIPPROB_ICON_Y;
-			addChild(tipProbBitmap);
+			levelTf = new TextField();
+			levelTf.selectable = false;
+			levelTf.defaultTextFormat = new TextFormat("Arial", 10, 0xffffff);
+			levelTf.text = decorType.expCount.toString();
+			levelTf.autoSize = TextFieldAutoSize.LEFT;
+			levelTf.x = LEVEL_TF_X;
+			levelTf.y = LEVEL_TF_CENTER_Y - levelTf.height / 2;
+			addChild(levelTf);
+			
+			tipsTf = new TextField();
+			tipsTf.selectable = false;
+			tipsTf.defaultTextFormat = new TextFormat("Arial", 10, 0xffffff);
+			if (decorType.tipProbCount == 0) {
+				tipsTf.text = "0%";
+			} else {
+				tipsTf.text = (decorType.tipProbCount * 100).toPrecision(1) + "%";
+			}
+			tipsTf.autoSize = TextFieldAutoSize.LEFT;
+			tipsTf.x = TIPS_TF_X;
+			tipsTf.y = TIPS_TF_CENTER_Y - tipsTf.height / 2;
+			addChild(tipsTf);
 			
 			priceTf = new TextField();
+			priceTf.selectable = false;
+			priceTf.defaultTextFormat = new TextFormat("Arial", 10, 0xffffff);
+			priceTf.autoSize = TextFieldAutoSize.LEFT;
 			priceTf.x = PRICE_TF_X;
-			priceTf.y = PRICE_TF_Y;
+			addChild(priceTf);
+			
+			loveBitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.SHOP_LOVE));
+			loveBitmap.x = LOVE_ICON_CENTER_X - loveBitmap.width / 2;
+			loveBitmap.y = LOVE_ICON_CENTER_Y - loveBitmap.height / 2;
+			addChild(loveBitmap);
+			
+			levelBitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.SHOP_LEV_PLUS));
+			levelBitmap.x = LEVEL_ICON_CENTER_X - levelBitmap.width / 2;
+			levelBitmap.y = LEVEL_ICON_CENTER_Y - levelBitmap.height / 2;
+			addChild(levelBitmap);
+			
+			tipsBitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.SHOP_TIPS));
+			tipsBitmap.x = TIPS_ICON_CENTER_X - tipsBitmap.width / 2;
+			tipsBitmap.y = TIPS_ICON_CENTER_Y - tipsBitmap.height / 2;
+			addChild(tipsBitmap);
+
 			if (decorType.priceEuro > 0) {
 				priceTf.text = decorType.priceEuro.toString();
-				moneyBitmap = new Bitmap(new BitmapData(10, 10, false, 0x00aa00));
+				moneyBitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.SHOP_EURO));
 			}
 			else {
 				priceTf.text = decorType.priceCent.toString();
-				moneyBitmap = new Bitmap(new BitmapData(10, 10, false, 0x00aa00));
+				moneyBitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.SHOP_CENTS));
 			}
-			moneyBitmap.x = MONEY_ICON_X;
-			moneyBitmap.y = MONEY_ICON_Y;
+			priceTf.y = PRICE_TF_CENTER_Y - priceTf.height / 2;
+			
+			moneyBitmap.x = MONEY_ICON_CENTER_X - moneyBitmap.width / 2;
+			moneyBitmap.y = MONEY_ICON_CENTER_Y - moneyBitmap.height / 2;
 			addChild(moneyBitmap);
-			priceTf.autoSize = TextFieldAutoSize.LEFT;
-			addChild(priceTf);
-			
-			enabledSprite = new Sprite();
-			enabledSprite.graphics.beginFill(0xaaaaaa, 0.7);
-			enabledSprite.graphics.drawRoundRect(0, 0, width, height, 8, 8);
-			enabledSprite.graphics.endFill();
-			enabledSprite.visible = false;
-			addChild(enabledSprite);
-			
-			levelTf = new TextField();
-			levelTf.visible = false;
-			levelTf.text = decorType.accessLevel.toString() + " уровень";
-			levelTf.autoSize = TextFieldAutoSize.LEFT;
-			levelTf.x = (width - levelTf.width) / 2;
-			levelTf.y = LEVEL_TF_Y;
-			addChild(levelTf);
-			
-			nameTf = new TextField();
-			nameTf.text = decorType.name;
-			nameTf.autoSize = TextFieldAutoSize.LEFT;
-			nameTf.x = (width - nameTf.width) / 2;
-			nameTf.y = NAME_TF_Y;
-			addChild(nameTf);
 		}
 		
-		public function set enabled(value: Boolean): void {
-			enabledSprite.visible = !value;
-			levelTf.visible = !value;
+		public function set enabledDecor(value: Boolean): void {
+			//enabledSprite.visible = !value;
+			enabled = value;
+			if (enabled) {
+				bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.SHOP_PANEL));
+				setSelect(true);
+				setHover(true, false);
+			}
+			else {
+				bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.SHOP_PANEL_GRAY));
+				setSelect(false);
+				setHover(false, false);
+			}
 		}
 		
-		public function get enabled(): Boolean {
-			return !enabledSprite.visible;
+		public function get enabledDecor(): Boolean {
+			return enabled;
+		}
+		
+		protected override function mouseOverListener(event:MouseEvent):void {
+			if (_hoverEnabled) {
+				super.mouseOverListener(event);
+				applyFilter(new GlowFilter(0xffffff, 1, 10, 10));
+			}
+		}
+		
+		protected override function mouseOutListener(event:MouseEvent):void {
+			if (_hoverEnabled) {
+				super.mouseOutListener(event);
+				removeFilter(GlowFilter);
+			}
 		}
 	}
 }

@@ -20,6 +20,11 @@ package com.bar.api
 	{
 		public static const STATE_CONNECTED: String = 'state_connected';
 		public static const STATE_DISCONNECTED: String = 'state_disconnected';
+		/**
+		 * Ограничение на количество запрашиваемых одновременно идишников друзей.
+		 * При большом количестве посылаемых идишников сервер глючит.
+		 */
+		public static const FRIENDS_LOAD_QUOTE: int = 50;
 		
 		private var _debug: Boolean;
 		private var _state: String;
@@ -38,6 +43,16 @@ package com.bar.api
 		 * [ByteArray]
 		 */
 		private var requestQueue: Array;
+		/**
+		 * Массив идишников друзей, которые осталось запросить
+		 */
+		private var requestFriendsIds: Array;
+		/**
+		 * Массив идишников друзей, которые прислал сервер
+		 */
+		private var loadFriendsIds: Array;
+		private var loadFriendsLevels: Array;
+		private var loadFriendsExp: Array;
 		
 		public function Server(host: String, port: int, debug: Boolean = false, target: IEventDispatcher = null)
 		{
@@ -313,11 +328,40 @@ package com.bar.api
 		}
 		
 		/**
-		 * Загрузить друзей пользователя
+		 * Загрузить друзей пользователя.
+		 * Отправляются все друзья, возвращаются те, которые зарегистрированы в игре.
 		 */
 		public function loadFriends(ids: Array): void {
+			requestFriendsIds = ids;
+			loadFriendsIds = new Array();
+			loadFriendsLevels = new Array();
+			loadFriendsExp = new Array();
 			
+			_loadFriends();
 		}
+		
+		private function _loadFriends(): void {
+			if (requestFriendsIds.length > 0) {
+				var requestedIdsCount: int = requestFriendsIds.length;
+				if (requestFriendsIds.length > FRIENDS_LOAD_QUOTE) {
+					requestedIdsCount = FRIENDS_LOAD_QUOTE;
+				}
+				var buf: ByteArray = new ByteArray();
+				buf.writeInt(ServerProtocol.C_LOAD_FRIENDS);
+				buf.writeInt(requestedIdsCount);
+				for (var i: Number = 0; i < requestedIdsCount; i++) {
+					buf.writeInt(requestFriendsIds[i]);
+				}
+				if (_state == STATE_CONNECTED) {
+					_client.sessionSend(buf);
+				}
+				else {
+					requestQueue.push(buf);
+				}
+				requestFriendsIds.splice(0, requestedIdsCount);
+			}
+		}
+		
 		/**
 		 * Получить ТОП игроков с сервера
 		 */
@@ -329,6 +373,22 @@ package com.bar.api
 		 */
 		public function loadBarCatalog(): void {
 			
+		}
+		
+		/**
+		 * votes - голоса в целых единицах
+		 */
+		public function withdrawVotes(votes: int, authKey: String): void {
+			var buf: ByteArray = new ByteArray();
+			buf.writeInt(ServerProtocol.C_WITHDRAW_VOTES);
+			buf.writeInt(votes);
+			buf.writeUTF(authKey);
+			if (_state == STATE_CONNECTED) {
+				_client.sessionSend(buf);
+			}
+			else {
+				requestQueue.push(buf);
+			}
 		}
 		
 		/**
@@ -387,6 +447,7 @@ package com.bar.api
 	            var token: int = buf.readInt();
 	            switch (token) {
 	            	case ServerProtocol.S_BAR_LOADED:
+	            		var firstLaunchInt: int = buf.readInt();
 	            		var id_user: String = buf.readUTF();
 	            		var fullName: String = buf.readUTF();
 	            		var photoPath: String = buf.readUTF();
@@ -457,12 +518,34 @@ package com.bar.api
 	            		bp.decor = decor;
 	            		debug('[S_BAR_LOADED]: ' + fullName + '(' + id_user + ') Lev:' + level + ' Exp:' + exp + ' Love:' + love + ' Inv:' + invites + ' Cents:' + moneyCent + ' Euro:' + moneyEuro);
 	            		var eventBarLoaded: ServerEvent = new ServerEvent(ServerEvent.EVENT_BAR_LOADED);
+	            		eventBarLoaded.firstLaunch = (firstLaunchInt == 1);
 	            		eventBarLoaded.barPlace = bp;
 	            		dispatchEvent(eventBarLoaded);
 	            	break;
-	            	case ServerProtocol.S_FIRST_LAUNCH:
-	            		var eventFirstLaunch: ServerEvent = new ServerEvent(ServerEvent.EVENT_FIRST_LAUNCH);
-	            		dispatchEvent(eventFirstLaunch);
+//	            	case ServerProtocol.S_FIRST_LAUNCH:
+//	            		debug('[S_FIRST_LAUNCH]');
+//	            		var eventFirstLaunch: ServerEvent = new ServerEvent(ServerEvent.EVENT_FIRST_LAUNCH);
+//	            		dispatchEvent(eventFirstLaunch);
+//	            	break;
+	            	case ServerProtocol.S_FRIENDS_LOADED:
+	            		var friendsCount: Number = buf.readInt();
+	            		debug('S_FRIENDS_LOADED: ' + friendsCount);
+	            		for (i = 0; i < friendsCount; i++) {
+	            			loadFriendsIds.push(buf.readInt());
+	            			loadFriendsLevels.push(buf.readInt());
+	            			loadFriendsExp.push(buf.readInt());
+	            		}
+	            		if (requestFriendsIds.length == 0) {
+	            			var eventFriendsLoaded: ServerEvent = new ServerEvent(ServerEvent.EVENT_FRIENDS_LOADED);
+	            			eventFriendsLoaded.friendsIds = loadFriendsIds;
+	            			eventFriendsLoaded.friendsLevels = loadFriendsLevels;
+	            			eventFriendsLoaded.friendsExp = loadFriendsExp;
+	            			dispatchEvent(eventFriendsLoaded);
+	            		}
+	            		else {
+	            			// грузим друзей дальше, пока не кончится массив requestFriendIds
+	            			_loadFriends();
+	            		}
 	            	break;
 	            	default:
 	            		debug('Undefined token!');

@@ -619,6 +619,9 @@ package com.flashmedia.gui
 		}
 		
 		private function createGameObject(value: *): GameObject {
+			if (value is Number) {
+				value = value.toString();
+			}
 			if (value is String) {
 				var label: Label = new Label(scene, value);
 				if (_textFormat) {

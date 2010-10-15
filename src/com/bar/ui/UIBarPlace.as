@@ -19,32 +19,34 @@ package com.bar.ui
 	import com.bar.ui.tooltips.ClientToolTip;
 	import com.bar.ui.tooltips.ProductionToolTip;
 	import com.bar.ui.windows.ExchangeWindow;
+	import com.bar.ui.windows.FriendsWindow;
 	import com.bar.ui.windows.Window;
 	import com.bar.util.Images;
 	import com.flashmedia.basics.GameLayer;
 	import com.flashmedia.basics.GameObject;
 	import com.flashmedia.basics.GameObjectEvent;
 	import com.flashmedia.basics.GameScene;
-	import com.flashmedia.basics.View;
 	import com.flashmedia.basics.actions.Visible;
 	import com.flashmedia.util.BitmapUtil;
 	
-	import flash.display.Bitmap;
-	import flash.display.BitmapData;
+	import flash.events.MouseEvent;
 	import flash.filters.ColorMatrixFilter;
 	import flash.filters.GlowFilter;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
+	import flash.text.TextFormat;
 
 	public class UIBarPlace extends GameLayer
 	{
-		public static const CLIENT_SIT_Y: Number = 529;
+		public static const CLIENT_BUTTONS_Y: Number = 450;
+		
+		public static const CLIENT_SIT_Y: Number = 553;
 		public static const CLIENT_SIT_CENTER_X: Array = [94, 275, 455, 635];
 		
-		public static const TIPS_POSITION_Y: Number = 430;
-		public static const TIPS_POSITION_X: Array = [100, 200, 300, 400, 500];
+		public static const TIPS_POSITION_Y: Number = 442;
+		public static const TIPS_POSITION_X: Array = [114, 257, 434, 583, 500];
 		
 		public static const BAR_TABLE_Y: Number = 436;
 		
@@ -56,11 +58,12 @@ package com.bar.ui
 		public static const PRODUCTION_ACTIVE_Z_ORDER: Number = 100;
 		public static const TOOLTIP_Z_ORDER: Number = 45;
 		public static const CLIENT_BTN_PANEL_Z_ORDER: Number = 35;
-		public static const TIPS_Z_ORDER: Number = 12;
+		public static const TIPS_Z_ORDER: Number = 23;
 		public static const CLIENT_Z_ORDER: Number = 25;
-		public static const CLIENT_SERVE_PANEL_Z_ORDER: Number = 37;
+		public static const CLIENT_SERVE_PANEL_Z_ORDER: Number = 38;
 		public static const MAIN_MENU_PANEL_Z_ORDER: Number = 37;
 		public static const EXCHANGE_WINDOW_Z_ORDER: Number = 60;
+		public static const FRIENDS_WINDOW_Z_ORDER: Number = 60;
 		public static const TOP_PANEL_Z_ORDER: Number = 37;
 		public static const PRODUCTION_SHOP_WINDOW_Z_ORDER: Number = 38;
 		public static const TUTORIAL_WINDOW_Z_ORDER: Number = 80;
@@ -74,22 +77,36 @@ package com.bar.ui
 		public var goDecor: Array;
 		public var prodCount: int;
 		public var shelf: UIShelf;
+		
+		public var ttProductionGameObject: GameObject;
 		public var ttProduction: ProductionToolTip;
+		public var ttClientGameObject: GameObject;
 		public var ttClient: ClientToolTip;
+		
 		public var cBntPanel: ClientButtonsPanel;
 		public var cOrderPanel: ClientOrderPanel;
 		public var clientGameObject: GameObject;
 		public var mainMenuPanel: MainMenuPanel;
 		public var topPanel: TopPanel;
 		public static var exchangeWindow: ExchangeWindow;
+		public static var friendsWindow: FriendsWindow;
 		//public var productionShopWindow: ProductionShopWindow;
 		//todo fix
 //		public var go1: GameObject;
 //		public var go2: GameObject;
 		
+		private static var instance: UIBarPlace;
+		public static function getInstance(): UIBarPlace {
+			return instance;
+		}
+		
 		public function UIBarPlace(value:GameScene)
 		{
 			super(value);
+			instance = this;
+			
+			scene.addEventListener(MouseEvent.CLICK, sceneMouseClick);
+			scene.addEventListener(MouseEvent.MOUSE_MOVE, sceneMouseMove);
 			
 			//todo resourse loading
 			Balance.clientTypes[0].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.CLIENT1));
@@ -111,6 +128,55 @@ package com.bar.ui
 			Balance.goodsTypes[7].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_MILLIONAIR));
 			Balance.goodsTypes[8].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_VODKA_TONIC));
 			Balance.goodsTypes[9].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_JAMESON_VISKI_SAYER));
+			//3 level
+			Balance.goodsTypes[10].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_GIN));
+			Balance.goodsTypes[11].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_SEX_BEACH));
+			Balance.goodsTypes[12].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_GIN_TONIC));
+			Balance.goodsTypes[13].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_PARADIZO));
+			Balance.goodsTypes[14].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_VANILA_ICE));
+			//4 level
+			Balance.goodsTypes[15].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_COFFEE));
+			Balance.goodsTypes[16].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_ORANGE_LIKER));
+			Balance.goodsTypes[17].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_IRISH_COFFEE));
+			Balance.goodsTypes[18].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_WHITE_LEDY));
+			//5 level
+			Balance.goodsTypes[19].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_TEKILA));
+			Balance.goodsTypes[20].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_TEKILA_SUNRISE));
+			Balance.goodsTypes[21].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_MARGARITA));
+			Balance.goodsTypes[22].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_GRANAT_MIX));
+			//6 level
+			Balance.goodsTypes[23].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_ROM));
+			Balance.goodsTypes[24].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_MAI_TAI));
+			Balance.goodsTypes[25].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_MOHITO));
+			Balance.goodsTypes[26].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_GAVANA));
+			//7 level
+			Balance.goodsTypes[27].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_TOMATO));
+			Balance.goodsTypes[28].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_COFFEE_LIKER));
+			Balance.goodsTypes[29].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_ROCKET));
+			Balance.goodsTypes[30].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_BLOOD_MARY));
+			//8 level
+			Balance.goodsTypes[31].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_ENERGETIC));
+			Balance.goodsTypes[32].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_BLUE));
+			Balance.goodsTypes[33].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_MARGARITA_BLUE));
+			Balance.goodsTypes[34].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_VODKA_BULL));
+			//9 level
+			Balance.goodsTypes[35].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_SAMBUKA));
+			Balance.goodsTypes[36].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_BLACK_RUS));
+			Balance.goodsTypes[37].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_BLUE_LAGUNA));
+			//10 level
+			Balance.goodsTypes[38].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_BALEIYS));
+			Balance.goodsTypes[39].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_B52));
+			Balance.goodsTypes[40].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_POSLE6));
+			//11 level
+			Balance.goodsTypes[41].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_KONJAK));
+			Balance.goodsTypes[42].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_SIDE_CAR));
+			Balance.goodsTypes[43].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_ABK));
+			Balance.goodsTypes[44].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_FRENCH_MOHITO));
+			//12 level
+			Balance.goodsTypes[45].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_ABSENT));
+			Balance.goodsTypes[46].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_MAGNUM44));
+			Balance.goodsTypes[47].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_ABSENT_BULL));
+			Balance.goodsTypes[48].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.GOODS_OBLAKA));
 			
 			//1 level
 			Balance.productionTypes[0].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.PROD_BEER));
@@ -119,41 +185,75 @@ package com.bar.ui
 			Balance.productionTypes[3].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.PROD_SODA));
 			//2 level
 			Balance.productionTypes[4].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.PROD_VISKI));
-			Balance.productionTypes[5].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.PROD_LIMON_CAP));
+			Balance.productionTypes[5].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.PROD_LIMON));
 			Balance.productionTypes[6].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.PROD_SIROP));
 			//3 level
+			Balance.productionTypes[7].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.PROD_ICE));
+			Balance.productionTypes[8].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.PROD_JIN));
+			//4 level
+			Balance.productionTypes[9].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.PROD_COFFEE));
+			Balance.productionTypes[10].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.PROD_SLIVKI));
+			Balance.productionTypes[11].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.PROD_ORANGE_LIKER));
+			//5 level
+			Balance.productionTypes[12].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.PROD_SIROP_GRENADIN));
+			Balance.productionTypes[13].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.PROD_TEKILA));
+			//6 level
+			Balance.productionTypes[14].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.PROD_MINT_CAP));
+			Balance.productionTypes[15].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.PROD_ROM));
+			//7 level
+			Balance.productionTypes[16].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.PROD_TOMATO));
+			Balance.productionTypes[17].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.PROD_COFFEE_LIKER));
+			//8 level
+			Balance.productionTypes[18].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.PROD_ENERGETIC));
+			Balance.productionTypes[19].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.PROD_BLUE_KUROSAO));
+			//9 level
+			Balance.productionTypes[20].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.PROD_SAMBUKA));
+			//10 level
+			Balance.productionTypes[21].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.PROD_BEILEYS));
+			//11 level
+			Balance.productionTypes[22].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.PROD_KONJAK));
+			//12 level
+			Balance.productionTypes[23].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.PROD_ABSENT));
 			
-			
+			//Decor
 			Balance.decorTypes[0].bitmap = Bar.multiLoader.get(Images.PICTURE1);
-//			Balance.decorTypes[0].bitmapSmall = new Bitmap(new BitmapData(20, 20, false, 0xffd1d4));
+			Balance.decorTypes[0].bitmapSmall = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.DECICO_PICTURE1));;
 			Balance.decorTypes[1].bitmap = Bar.multiLoader.get(Images.SHKAF1);
-//			Balance.decorTypes[1].bitmapSmall = new Bitmap(new BitmapData(20, 20, false, 0xa3d0e4));
+			Balance.decorTypes[1].bitmapSmall = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.DECICO_SHKAF1));
 			Balance.decorTypes[2].bitmap = Bar.multiLoader.get(Images.WALL1);
-//			Balance.decorTypes[2].bitmapSmall = new Bitmap(new BitmapData(20, 20, false, 0xa3d0e4));
+			Balance.decorTypes[2].bitmapSmall = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.DECICO_WALL1));;
 			Balance.decorTypes[3].bitmap = Bar.multiLoader.get(Images.BARTABLE1);
-//			Balance.decorTypes[3].bitmapSmall = new Bitmap(new BitmapData(20, 20, false, 0xa3d0e4));
+			Balance.decorTypes[3].bitmapSmall = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.DECICO_BARTABLE1));;
 			for (var i: int = 4; i <= 7; i++) {
-				Balance.decorTypes[i].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.STUL1));
-//				Balance.decorTypes[i].bitmapSmall = BitmapUtil.cloneBitmap(new Bitmap(new BitmapData(20, 20, false, 0xa3d0e4)));
+				Balance.decorTypes[i].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.STUL1_BACK));
+				Balance.decorTypes[i].bitmapSmall = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.DECICO_STUL1));
 			}
 			for (i = 8; i <= 9; i++) {
 				Balance.decorTypes[i].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.LAMP1));
-//				Balance.decorTypes[i].bitmapSmall = BitmapUtil.cloneBitmap(new Bitmap(new BitmapData(20, 20, false, 0xa3d0e4)));
+				Balance.decorTypes[i].bitmapSmall = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.DECICO_LAMP1));
 			}
 			Balance.decorTypes[10].bitmap = Bar.multiLoader.get(Images.WOMAN_BODY);
 			Balance.decorTypes[11].bitmap = Bar.multiLoader.get(Images.WOMAN_PANTS1);
 			Balance.decorTypes[12].bitmap = Bar.multiLoader.get(Images.WOMAN_BUST1);
 			Balance.decorTypes[13].bitmap = Bar.multiLoader.get(Images.WOMAN_TSHIRT1);
 			Balance.decorTypes[14].bitmap = Bar.multiLoader.get(Images.WOMAN_SKIRT1);
-			Balance.decorTypes[15].bitmap = Bar.multiLoader.get(Images.BARTABLE_BACK1);
-			Balance.decorTypes[16].bitmap = Bar.multiLoader.get(Images.PICTURE2);
-			Balance.decorTypes[17].bitmap = Bar.multiLoader.get(Images.PICTURE3);
-			
+//			Balance.decorTypes[15].bitmap = Bar.multiLoader.get(Images.BARTABLE_BACK1);
+			Balance.decorTypes[15].bitmap = Bar.multiLoader.get(Images.PICTURE2);
+			Balance.decorTypes[15].bitmapSmall = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.DECICO_PICTURE2));
+			Balance.decorTypes[16].bitmap = Bar.multiLoader.get(Images.PICTURE3);
+			Balance.decorTypes[16].bitmapSmall = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.DECICO_PICTURE3));
+			for (i = 17; i <= 20; i++) {
+				Balance.decorTypes[i].bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.STUL1_FOREWARD));
+			}
+			Balance.decorTypes[21].bitmap = Bar.multiLoader.get(Images.WALL2);
+			Balance.decorTypes[21].bitmapSmall = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.DECICO_WALL2));
+			Balance.decorTypes[22].bitmap = Bar.multiLoader.get(Images.WALL3);
+			Balance.decorTypes[22].bitmapSmall = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.DECICO_WALL3));
 			//todo remove
-			graphics.lineStyle(2, 0xff0000);
-			graphics.moveTo(0, BAR_TABLE_Y);
-			graphics.lineTo(Bar.WIDTH, BAR_TABLE_Y);
-			graphics.drawRect(0, 0, Bar.WIDTH, Bar.HEIGHT);
+//			graphics.lineStyle(2, 0xff0000);
+//			graphics.moveTo(0, BAR_TABLE_Y);
+//			graphics.lineTo(Bar.WIDTH, BAR_TABLE_Y);
+//			graphics.drawRect(0, 0, Bar.WIDTH, Bar.HEIGHT);
 			
 			// создание пустых клиентов			
 			goClients = new Array(Balance.maxClientsCount);
@@ -192,11 +292,13 @@ package com.bar.ui
 				go = new GameObject(scene);
 				go.visible = false;
 				go.setSelect(true);
-				go.bitmap = new Bitmap(new BitmapData(15, 15, false, 0x00ee00));
+				go.bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.TIPS));
 				go.zOrder = TIPS_Z_ORDER;
 				go.x = TIPS_POSITION_X[i];
 				go.y = TIPS_POSITION_Y;
 				go.addEventListener(GameObjectEvent.TYPE_MOUSE_CLICK, onTipsMouseClick);
+				go.addEventListener(GameObjectEvent.TYPE_SET_HOVER, onItemSetHover);
+				go.addEventListener(GameObjectEvent.TYPE_LOST_HOVER, onItemLostHover);
 				goTips[i] = go;
 				tipsClientIds[i] = 0;
 				addChild(go);
@@ -211,15 +313,14 @@ package com.bar.ui
 			
 			mainMenuPanel = new MainMenuPanel(scene);
 			mainMenuPanel.zOrder = MAIN_MENU_PANEL_Z_ORDER;
-			mainMenuPanel.addProduction(Balance.productionTypes, Bar.core.myBarPlace.user.licensedProdTypes, Bar.core.myBarPlace.user.level);
-			mainMenuPanel.addDecor(Balance.decorTypes, Bar.core.myBarPlace.user.level);
-			mainMenuPanel.addGoods(Balance.goodsTypes, Bar.core.myBarPlace.user.level);
 			mainMenuPanel.addEventListener(MainMenuPanelEvent.EVENT_ITEM_CLICK, mainMenuItemClick);
 			mainMenuPanel.addEventListener(MainMenuPanelEvent.EVENT_PRODUCTION_CLICK, mainMenuProductionClick);
 			mainMenuPanel.addEventListener(MainMenuPanelEvent.EVENT_LICENSE, mainMenuLicense);
 			mainMenuPanel.addEventListener(MainMenuPanelEvent.EVENT_DECOR_CLICK, mainMenuDecorClick);
 			mainMenuPanel.addEventListener(MainMenuPanelEvent.EVENT_DECOR_OVER, mainMenuDecorOver);
 			mainMenuPanel.addEventListener(MainMenuPanelEvent.EVENT_DECOR_OUT, mainMenuDecorOut);
+			mainMenuPanel.addEventListener(MainMenuPanelEvent.EVENT_INVITE_FRIEND, mainMenuInviteFriend);
+			mainMenuPanel.addEventListener(MainMenuPanelEvent.EVENT_FRIEND_CLICK, mainMenuFriendClick);
 			addChild(mainMenuPanel);
 			
 			topPanel = new TopPanel(scene);
@@ -236,6 +337,13 @@ package com.bar.ui
 			exchangeWindow.zOrder = EXCHANGE_WINDOW_Z_ORDER;
 			addChild(exchangeWindow);
 			
+			friendsWindow = new FriendsWindow(scene);
+			friendsWindow.x = (Bar.WIDTH - friendsWindow.width) / 2;
+			friendsWindow.y = (Bar.HEIGHT - friendsWindow.height) / 2;
+			friendsWindow.visible = false;
+			friendsWindow.zOrder = FRIENDS_WINDOW_Z_ORDER;
+			addChild(friendsWindow);
+			
 //			productionShopWindow = new ProductionShopWindow(scene);
 //			productionShopWindow.zOrder = PRODUCTION_SHOP_WINDOW_Z_ORDER;
 //			productionShopWindow.visible = false;
@@ -246,6 +354,7 @@ package com.bar.ui
 			
 			cBntPanel = new ClientButtonsPanel(scene);
 			cBntPanel.zOrder = CLIENT_BTN_PANEL_Z_ORDER;
+			cBntPanel.y = CLIENT_BUTTONS_Y;
 			cBntPanel.visible = false;
 			cBntPanel.serveButton.addEventListener(GameObjectEvent.TYPE_MOUSE_CLICK, onServeClientBtnClick);
 			cBntPanel.denyButton.addEventListener(GameObjectEvent.TYPE_MOUSE_CLICK, onDenyClientBtnClick);
@@ -258,60 +367,13 @@ package com.bar.ui
 			cOrderPanel.addEventListener(ClientOrderPanelEvent.EVENT_CANCEL, onServeCancel);
 			addChild(cOrderPanel);
 			
-			ttProduction = new ProductionToolTip(scene, 100, 40);
+			ttProduction = new ProductionToolTip(scene);
 			ttProduction.zOrder = TOOLTIP_Z_ORDER;
 			addChild(ttProduction);
 			
-			ttClient = new ClientToolTip(scene, 100, 40);
+			ttClient = new ClientToolTip(scene);
 			ttClient.zOrder = TOOLTIP_Z_ORDER;
 			addChild(ttClient);
-			
-//			var c1: Client = new Client(Balance.clientTypes[0], '12345', 'Вася Пупкин', false, new Date().getTime() / 1000, Balance.goodsTypes[0], 1);
-//			c1.orderGoodsType = Balance.goodsTypes[2]; 
-//			addClient(c1);
-//			
-//			go1 = new GameObject(scene);
-//			go2 = new GameObject(scene);
-//			
-//			go1.zOrder = PRODUCTION_Z_ORDER;
-//			go1.setSelect(true);
-//			go1.canDrag = true;
-//			go1.setFocus(true);
-//			go1.setHover(true);
-//			go1.type = UIShelf.GAME_OBJECT_TYPE;
-//			go1.bitmap = BitmapUtil.cloneBitmap(Balance.productionTypes[0].bitmap);
-//			go1.x = 200;
-//			go1.y = 200;
-//			go1.addEventListener(GameObjectEvent.TYPE_DRAG_STARTED, shelf.onDragStartedProductionObject);
-//			go1.addEventListener(GameObjectEvent.TYPE_DRAG_STARTED, onDragStartedProductionObject);
-//			go1.addEventListener(GameObjectEvent.TYPE_DRAGGING, shelf.onDragProductionObject);
-//			go1.addEventListener(GameObjectEvent.TYPE_MOUSE_UP, shelf.onProductionMouseUp);
-//			go1.addEventListener(GameObjectEvent.TYPE_MOUSE_UP, onProductionMouseUp);
-//			go1.addEventListener(GameObjectEvent.TYPE_SET_HOVER, onProductionMouseHover);
-//			go1.addEventListener(GameObjectEvent.TYPE_LOST_HOVER, onProductionLostHover);
-//			addChild(go1);
-//			
-//			go2.zOrder = PRODUCTION_Z_ORDER;
-//			go2.setSelect(true);
-//			go2.canDrag = true;
-//			go2.setFocus(true);
-//			go2.setHover(true);
-//			go2.type = UIShelf.GAME_OBJECT_TYPE;
-//			go2.bitmap = BitmapUtil.cloneBitmap(Balance.productionTypes[1].bitmap);
-//			go2.x = 230;
-//			go2.y = 10;
-//			go2.addEventListener(GameObjectEvent.TYPE_DRAG_STARTED, shelf.onDragStartedProductionObject);
-//			go2.addEventListener(GameObjectEvent.TYPE_DRAG_STARTED, onDragStartedProductionObject);
-//			go2.addEventListener(GameObjectEvent.TYPE_DRAGGING, shelf.onDragProductionObject);
-//			go2.addEventListener(GameObjectEvent.TYPE_MOUSE_UP, shelf.onProductionMouseUp);
-//			go2.addEventListener(GameObjectEvent.TYPE_MOUSE_UP, onProductionMouseUp);
-//			go2.addEventListener(GameObjectEvent.TYPE_SET_HOVER, onProductionMouseHover);
-//			go2.addEventListener(GameObjectEvent.TYPE_LOST_HOVER, onProductionLostHover);
-//			addChild(go2);
-			
-//			shelf.addProduction(go1, false);
-//			shelf.addProduction(go2, false);
-			
 			
 			Bar.core.addEventListener(CoreEvent.EVENT_BAR_LOADED, barLoaded);
 			Bar.core.addEventListener(CoreEvent.EVENT_DECOR_LOADED, decorLoaded);
@@ -333,12 +395,27 @@ package com.bar.ui
 			Bar.core.addEventListener(CoreEvent.EVENT_PRODUCTION_EMPTY, productionEmpty);
 			Bar.core.addEventListener(CoreEvent.EVENT_PRODUCTION_DELETED, productionDeleted);
 			Bar.core.addEventListener(CoreEvent.EVENT_USER_MONEY_CENT_CHANGED, userMoneyCentChanged);
+			Bar.core.addEventListener(CoreEvent.EVENT_USER_MONEY_EURO_CHANGED, userMoneyEuroChanged);
 			Bar.core.addEventListener(CoreEvent.EVENT_USER_EXP_CHANGED, userExpChanged);
 			Bar.core.addEventListener(CoreEvent.EVENT_USER_LEVEL_CHANGED, userLevelChanged);
 			Bar.core.addEventListener(CoreEvent.EVENT_USER_LOVE_CHANGED, userLoveChanged);
 			Bar.core.addEventListener(CoreEvent.EVENT_BARMAN_TAKE_TIP, barmanTakeTip);
 			Bar.core.addEventListener(CoreEvent.EVENT_TIPS_DELETED, tipsDeleted);
 			Bar.core.addEventListener(CoreEvent.EVENT_DECOR_ADDED_TO_BAR, addDecorToBar);
+		}
+		
+		public function sceneMouseMove(event: MouseEvent): void {
+			if (ttProduction.visible && ttProduction.visAction.isStopped) {
+				ttProduction.hide();
+			}
+		}
+		
+		private var dontHideCBtn: Boolean;
+		public function sceneMouseClick(event: MouseEvent): void {
+			if (cBntPanel.visible && !dontHideCBtn) {
+				cBntPanel.visible = false;
+			}
+			dontHideCBtn = false;
 		}
 		
 		public function mainMenuProductionClick(event: MainMenuPanelEvent): void {
@@ -408,6 +485,14 @@ package com.bar.ui
 			}
 		}
 		
+		public function mainMenuInviteFriend(event: MainMenuPanelEvent): void {
+			//TODO
+		}
+		
+		public function mainMenuFriendClick(event: MainMenuPanelEvent): void {
+			//TODO
+		}
+		
 		public function onShelfProductionPlaceChanged(event: UIShelfEvent): void {
 			Bar.core.moveProduction(event.gameObject.id, event.cellIndex, event.rowIndex);
 		}
@@ -463,13 +548,14 @@ package com.bar.ui
 			if (!event.gameObject.isDragging) {
 				var p: Production = Bar.core.getProductionById(event.gameObject.id);
 				ttProduction.setAttrs(p.typeProduction.name, p.partsCount);
-				ttProduction.surface(event.gameObject);
+				ttProduction.surfaceXY(event.gameObject.x + event.gameObject.width / 2,
+												event.gameObject.y, 20);
 			}
 		}
 		
 		public function onProductionLostHover(event: GameObjectEvent): void {
 			event.gameObject.removeFilter(ColorMatrixFilter);
-			ttProduction.hide();
+			//ttProduction.hide();
 		}
 		
 		public function addClient(c: Client): void {
@@ -501,12 +587,20 @@ package com.bar.ui
 //			addChild(go);
 		}
 		
+		public function onItemSetHover(event: GameObjectEvent): void {
+			event.gameObject.applyFilter(new GlowFilter(0xffffff, 1, 10, 10));
+		}
+		
+		public function onItemLostHover(event: GameObjectEvent): void {
+			event.gameObject.removeFilter(GlowFilter);
+		}
+		
 		public function onClientSetHover(event: GameObjectEvent): void {
 			//todo изменение прозрачности
 			event.gameObject.applyFilter(new GlowFilter(0xffffff, 1, 10, 10));
 			var c: Client = Bar.core.getClientById(event.gameObject.id);
 			ttClient.setAttrs(c.name, c.orderGoodsType.name, Balance.getGoodsTypeByName(c.orderGoodsType.type).bitmap);
-			ttClient.surface(event.gameObject);
+			ttClient.surfaceXY(CLIENT_SIT_CENTER_X[(event.gameObject as UIClient).client.position], CLIENT_SIT_Y - 220, 10);
 		}
 		
 		public function onClientLostHover(event: GameObjectEvent): void {
@@ -521,9 +615,12 @@ package com.bar.ui
 		public function onClientMouseClick(event: GameObjectEvent): void {
 			ttClient.hide();
 			clientGameObject = event.gameObject;
-			cBntPanel.x = event.gameObject.x + event.gameObject.width / 2 - cBntPanel.width / 2;
-			cBntPanel.y = event.gameObject.y + event.gameObject.height / 2 - cBntPanel.height / 2;
+			var c: UIClient = event.gameObject as UIClient;
+			cBntPanel.x = CLIENT_SIT_CENTER_X[c.client.position] - cBntPanel.width / 2;
+//			cBntPanel.x = event.gameObject.x + event.gameObject.width / 2 - cBntPanel.width / 2;
+//			cBntPanel.y = event.gameObject.y + event.gameObject.height / 2 - cBntPanel.height / 2;
 			cBntPanel.visible = true;
+			dontHideCBtn = true;
 		}
 		
 		public function onTipsMouseClick(event: GameObjectEvent): void {
@@ -612,6 +709,9 @@ package com.bar.ui
 				//trace('    Production: ' + p.typeProduction.name + '(' + p.partsCount + ') ' + p.id);
 				addProduction(p);
 			}
+			mainMenuPanel.addProduction(Balance.productionTypes, Bar.core.myBarPlace.user.licensedProdTypes, Bar.core.myBarPlace.user.level);
+			mainMenuPanel.addDecor(Balance.decorTypes, Bar.core.myBarPlace.user.level);
+			mainMenuPanel.addGoods(Balance.goodsTypes, Bar.core.myBarPlace.user.level);
 			mainMenuPanel.setDecorForSell(Bar.core.enableForBuyDecor());
 			for each (var d: Decor in event.barPlace.decor) {
 				for each (var go: GameObject in goDecor) {
@@ -633,6 +733,7 @@ package com.bar.ui
 			else {
 				
 			}
+			mainMenuPanel.requestFriends();
 		}
 		
 		public function decorLoaded(event: CoreEvent): void {
@@ -655,7 +756,18 @@ package com.bar.ui
 		public function clientStartServing(event: CoreEvent): void {
 			trace('Start Serving Client: ' + event.client.name + '. Order: ' + event.client.orderGoodsType.name);
 			cBntPanel.visible = false;
-			cOrderPanel.showGoods(event.client.orderGoodsType, clientGameObject);
+			var xx: Number = 0;
+			switch (event.client.position) {
+				case 0:
+				xx = 30;
+				break;
+				case 3:
+				xx = -40;
+				break;
+			}
+			cOrderPanel.showGoods(event.client.orderGoodsType,
+									CLIENT_SIT_CENTER_X[event.client.position] - cOrderPanel.width / 2 + xx,
+									clientGameObject.y + (clientGameObject.height - cOrderPanel.height) / 2);
 			highLightNeedProduction();
 		}
 		
@@ -670,7 +782,7 @@ package com.bar.ui
 			cOrderPanel.visible = false;
 			deleteClient(event.client);
 			highLightNeedProduction();
-			if (event.firstClientServed) {
+			if (Bar.core.firstLaunch && event.firstClientServed) {
 				showTutorial(TUTORIAL_AFTER_FIRST_SERVE);
 			}
 		}
@@ -759,6 +871,12 @@ package com.bar.ui
 //			}
 		}
 		
+		public function userMoneyEuroChanged(event: CoreEvent): void {
+			var d: Number = event.newMoneyEuro - event.oldMoneyEuro;
+			trace('$$$ Money Euro: ' + event.newMoneyEuro + ' (' + ((event.newMoneyEuro > event.oldMoneyEuro)?'+':'') + d + ')');
+			topPanel.euro = event.newMoneyEuro;
+		}
+		
 		public function userLevelChanged(event: CoreEvent): void {
 			var d: Number = event.newLevel - event.oldLevel;
 			trace('Level: ' + event.newLevel + ' (' + ((event.newLevel > event.oldLevel)?'+':'') + d + ')');
@@ -843,11 +961,9 @@ package com.bar.ui
 		
 		public static const TUTORIAL_WIDTH: Number = 300;
 		public static const TUTORIAL_HEIGHT: Number = 300;
-		public static const TUTORIAL_TEXT_WIDTH: Number = 200;
-		public static const TUTORIAL_TEXT_Y: Number = 30;
-		public static const TUTORIAL_BTN_Y: Number = 250;
-		public static const TUTORIAL_BTN_WIDTH: Number = 100;
-		public static const TUTORIAL_BTN_HEIGHT: Number = 30;
+		public static const TUTORIAL_TEXT_WIDTH: Number = 250;
+		public static const TUTORIAL_TEXT_Y: Number = 25;
+		public static const TUTORIAL_BTN_Y: Number = 277;
 		public var tutorialWindow: Window;
 		public var tutorialArrow: GameObject;
 		public var tutorialNextButton: GameObject;
@@ -872,16 +988,10 @@ package com.bar.ui
 			tutorialArrow.visible = false;
 			if (!tutorialNextButton) {
 				tutorialNextButton = new GameObject(scene);
-				tutorialNextButton.x = (TUTORIAL_WIDTH - TUTORIAL_BTN_WIDTH) / 2;
+				tutorialNextButton.bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.BTN_NEXT));
+				tutorialNextButton.x = (TUTORIAL_WIDTH - tutorialNextButton.width) / 2;
 				tutorialNextButton.y = TUTORIAL_BTN_Y;
 				tutorialNextButton.setSelect(true);
-				tutorialNextButton.bitmap = new Bitmap(new BitmapData(TUTORIAL_BTN_WIDTH, TUTORIAL_BTN_HEIGHT, false, 0xff0000));
-				var btf: TextField = new TextField();
-				btf.width = 200;
-				btf.selectable = false;
-				btf.autoSize = TextFieldAutoSize.LEFT;
-				btf.text = 'Далее';
-				tutorialNextButton.setTextField(btf, View.ALIGN_HOR_CENTER | View.ALIGN_VER_CENTER);
 				tutorialWindow.addChild(tutorialNextButton);
 				tutorialNextButton.addEventListener(GameObjectEvent.TYPE_MOUSE_CLICK, function (event: GameObjectEvent): void {
 					switch (tutorialState) {
@@ -903,17 +1013,10 @@ package com.bar.ui
 			tutorialNextButton.visible = false;
 			if (!tutorialGoButton) {
 				tutorialGoButton = new GameObject(scene);
-				tutorialGoButton.x = (TUTORIAL_WIDTH - TUTORIAL_BTN_WIDTH) / 2;
+				tutorialGoButton.bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.BTN_PLAY));
+				tutorialGoButton.x = (TUTORIAL_WIDTH - tutorialGoButton.width) / 2;
 				tutorialGoButton.y = TUTORIAL_BTN_Y;
-				tutorialGoButton.width = TUTORIAL_BTN_WIDTH;
-				tutorialGoButton.height = TUTORIAL_BTN_HEIGHT;
 				tutorialGoButton.setSelect(true);
-				tutorialGoButton.bitmap = new Bitmap(new BitmapData(TUTORIAL_BTN_WIDTH, TUTORIAL_BTN_HEIGHT, false, 0xff0000));
-				btf = new TextField();
-				btf.width = 200;
-				btf.autoSize = TextFieldAutoSize.LEFT;
-				btf.text = 'Играть!';
-				tutorialGoButton.setTextField(btf, View.ALIGN_HOR_CENTER | View.ALIGN_VER_CENTER);
 				tutorialWindow.addChild(tutorialGoButton);
 				tutorialGoButton.addEventListener(GameObjectEvent.TYPE_MOUSE_CLICK, function (event: GameObjectEvent): void {
 					switch (tutorialState) {
@@ -936,6 +1039,7 @@ package com.bar.ui
 			tutorialGoButton.visible = false;
 			if (!tutorialMessageTextField) {
 				tutorialMessageTextField = new TextField();
+				tutorialMessageTextField.defaultTextFormat = new TextFormat("Arial", 14);
 				tutorialMessageTextField.width = TUTORIAL_TEXT_WIDTH;
 				tutorialMessageTextField.wordWrap = true;
 				tutorialMessageTextField.selectable = false;
@@ -950,7 +1054,8 @@ package com.bar.ui
 //			}
 			switch (tutorialState) {
 				case TUTORIAL_HELLO:
-					tutorialMessageTextField.text = 'Привет! Поздравляю, у тебя теперь есть свой бар.\n' +
+					tutorialMessageTextField.text = 'Привет!\n' + 
+						'Поздравляю, у тебя теперь есть свой бар.\n' +
 						'Здесь ты сможешь принимать посетителей и зарабатывать деньги!\n' +
 						'Обустраивай свой бар - сделай его самым лучшим!';
 					tutorialMessageTextField.visible = true;
@@ -959,11 +1064,12 @@ package com.bar.ui
 				case TUTORIAL_ATTRS:
 					//TODO arrow
 					//TODO иконки характеристик
-					tutorialMessageTextField.text = 'Тебе как владельцу бара стоит знать все основные характеристики бара:\n' + 
+					tutorialMessageTextField.text = 'Тебе как владельцу стоит знать все основные характеристики:\n' + 
 							'Уровень - отображается рядом с твоим аватаром\n' + 
-							'Любовь - насколько твой бар любят клиенты. Чем больше любовь, тем выше количество посетителей.\n' + 
-							'Центы - монетки\n' + 
-							'Евро - специальные возможности.';
+							'Опыт - прибавляется от каждого приготовленного коктейля.'
+							'Любовь - уровень любви твоих клиентов. Чем больше любовь, тем выше количество посетителей.\n' + 
+							'Центы - основной вид денег для покупки продукции в магазине.\n' + 
+							'Евро - служат для покупки специальных предметов интерьера и оплаты некоторых услуг.';
 					tutorialMessageTextField.visible = true;
 					tutorialNextButton.visible = true;
 					break;
@@ -979,7 +1085,8 @@ package com.bar.ui
 				case TUTORIAL_AFTER_FIRST_SERVE:
 					//TODO arrow to shop
 					//TODO иконка магазина продукции
-					tutorialMessageTextField.text = 'Отлично! Посетитель ушел в хорошем настроении и наверняка зайдет еще :)\n' + 
+					tutorialMessageTextField.text = 'Отлично!\n' + 
+							'Посетитель ушел в хорошем настроении и наверняка зайдет еще :)\n' + 
 							'Если у тебя закончилась какая-то продукция, ты можешь купить ее в магазине.\n' + 
 							'Теперь ты знаешь все необходимое для начала работы. Набери 2 уровень!';
 					tutorialMessageTextField.visible = true;
@@ -1009,16 +1116,14 @@ package com.bar.ui
 		//-----------------------------------------------------------------------
 		//-----------------------------------------------------------------------
 		
-		public static const UP_LEVEL_WIDTH: Number = 450;
+		public static const UP_LEVEL_WIDTH: Number = 700;
 		public static const UP_LEVEL_HEIGHT: Number = 300;
-		public static const UP_LEVEL_TEXT_WIDTH: Number = 300;
+		public static const UP_LEVEL_TEXT_WIDTH: Number = 500;
 		public static const UP_LEVEL_TEXT_Y: Number = 30;
 		public static const UP_LEVEL_BTN_Y: Number = 250;
-		public static const UP_LEVEL_BTN_WIDTH: Number = 100;
-		public static const UP_LEVEL_BTN_HEIGHT: Number = 30;
 		public static const UP_LEVEL_GOODS_Y: Number = 100;
-		public static const UP_LEVEL_PRODUCTION_Y: Number = 200;
-		public static const UP_LEVEL_BETWEEN_PANELS: Number = 15;
+		public static const UP_LEVEL_PRODUCTION_Y: Number = 190;
+		public static const UP_LEVEL_BETWEEN_PANELS: Number = 5;
 		public var upLevelWindow: Window;
 		public var upLevelGoButton: GameObject;
 		public var upLevelMessageTextField: TextField;
@@ -1036,28 +1141,21 @@ package com.bar.ui
 				addChild(upLevelWindow);
 			}
 			upLevelWindow.visible = true;
-			tutorialArrow.visible = false;
 			if (!upLevelGoButton) {
 				upLevelGoButton = new GameObject(scene);
-				upLevelGoButton.x = (UP_LEVEL_WIDTH - UP_LEVEL_BTN_WIDTH) / 2;
+				upLevelGoButton.bitmap = BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.BTN_PLAY));
+				upLevelGoButton.x = (UP_LEVEL_WIDTH - upLevelGoButton.width) / 2;
 				upLevelGoButton.y = TUTORIAL_BTN_Y;
-				upLevelGoButton.width = UP_LEVEL_BTN_WIDTH;
-				upLevelGoButton.height = UP_LEVEL_BTN_HEIGHT;
 				upLevelGoButton.setSelect(true);
-				upLevelGoButton.bitmap = new Bitmap(new BitmapData(UP_LEVEL_BTN_WIDTH, UP_LEVEL_BTN_HEIGHT, false, 0xff0000));
-				var btf: TextField = new TextField();
-				btf.width = 200;
-				btf.autoSize = TextFieldAutoSize.LEFT;
-				btf.text = 'Играть!';
-				upLevelGoButton.setTextField(btf, View.ALIGN_HOR_CENTER | View.ALIGN_VER_CENTER);
 				upLevelWindow.addChild(upLevelGoButton);
 				upLevelGoButton.addEventListener(GameObjectEvent.TYPE_MOUSE_CLICK, function (event: GameObjectEvent): void {
 					hideUpLevel();
 				});
 			}
-			upLevelGoButton.visible = false;
+			upLevelGoButton.visible = true;
 			if (!upLevelMessageTextField) {
 				upLevelMessageTextField = new TextField();
+				upLevelMessageTextField.defaultTextFormat = new TextFormat("Arial", 14);
 				upLevelMessageTextField.width = UP_LEVEL_TEXT_WIDTH;
 				upLevelMessageTextField.wordWrap = true;
 				upLevelMessageTextField.selectable = false;
@@ -1089,7 +1187,7 @@ package com.bar.ui
 			for each (var pp: ProductionPanel in upLevelProduction) {
 				pp.x = xx;
 				pp.y = UP_LEVEL_PRODUCTION_Y; 
-				pp.enabled = true;
+				pp.enabledProduction = true;
 				pp.licensed = true;
 				xx += ProductionPanel.WIDTH + UP_LEVEL_BETWEEN_PANELS;
 				upLevelWindow.addChild(pp);
@@ -1114,7 +1212,7 @@ package com.bar.ui
 			for each (var gp: GoodsPanel in upLevelGoods) {
 				gp.x = xx;
 				gp.y = UP_LEVEL_GOODS_Y; 
-				gp.enabled = true;
+				gp.enabledGoods = true;
 				xx += GoodsPanel.WIDTH + UP_LEVEL_BETWEEN_PANELS;
 				upLevelWindow.addChild(gp);
 			}

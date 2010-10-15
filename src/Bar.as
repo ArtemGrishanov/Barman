@@ -12,19 +12,22 @@ package {
 	import flash.events.ErrorEvent;
 	import flash.events.Event;
 
+	[SWF(width="730", height="730", backgroundColor="#ffffff", frameRate="25")]
+
 	public class Bar extends GameScene
 	{
 		public static const WIDTH: Number = 730;
 		public static const HEIGHT: Number = 730;
 		
-		public static var viewer_id: String = '9028622';
+		public static var authKey: String = '';
+		public static var viewer_id: String = '9028622'; //57856825	9028622
 		public static var fullName: String = 'Артем Гришанов';
 		public static var photoPath: String = 'http://cs295.vkontakte.ru/u9028622/a_f6aef0ce.jpg';
-//		public static const host: String = '127.0.0.1';
+		public static const host: String = '127.0.0.1';
 //		public static const port: int = 1139;
-		public static const host: String = '81.177.33.114';
+//		public static const host: String = '81.177.33.114';
 		public static const port: int = 1139;
-		public static const vk_id: String = '9028622';
+//		public static const vk_id: String = '9028622';
 		public static const password: String = 'password';
 		public static var server: Server;
 		public static var core: Core;
@@ -38,14 +41,15 @@ package {
 		public function Bar()
 		{
 			// TODO FIX
-			scaleX = 0.8;
-			scaleY = 0.8;
-			
+//			scaleX = 0.8;
+//			scaleY = 0.8;
+
 			MultiLoader.usingContext = true;
 			multiLoader = new MultiLoader();
-			socialNet = new SocialNet(SocialNet.NET_SANDBOX);
-//			server = new Server(host, port, true);
-//			server.connect(vk_id, password);
+			socialNet = new SocialNet(SocialNet.NET_VKONTAKTE);
+			server = new Server(host, port, true);
+			core = new Core(viewer_id, fullName, photoPath, server);
+			server.connect(viewer_id, password);
 			addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 			
 //			var test: TestModel = new TestModel();
@@ -81,9 +85,14 @@ package {
 		
 		public function onAddedToStage(e: Event): void {
 			var wrapper: Object = this.parent.parent;
-//	    	if (Util.wrapper.application) {
+	    	if (wrapper && wrapper.application && wrapper.external) {
+	    		authKey = wrapper.application.parameters.auth_key;
 //	    		appObject = Util.wrapper.application;
-//	    		Util.wrapper.external.resizeWindow(Constants.APP_WIDTH, Constants.APP_HEIGHT);
+				//wrapper.application.scaleMode = StageScaleMode.NO_SCALE;
+				//wrapper.application.quality = StageQuality.HIGH;
+				//wrapper.application.align = StageAlign.LEFT;
+				//wrapper.
+	    		//wrapper.external.callMethod('resizeWindow', WIDTH, HEIGHT);
 //	    		
 //	    		api_result = appObject.parameters.api_result;
 //	    		VKontakte.apiUrl = appObject.parameters.api_url;
@@ -96,7 +105,7 @@ package {
 //	    		
 //	    		Util.wrapper.addEventListener('onApplicationAdded', onApplicationAdded);
 //	    		Util.wrapper.addEventListener('onSettingsChanged', onSettingsChanged);
-//	    	}
+	    	}
 	    	multiLoader.addEventListener(ErrorEvent.ERROR, multiloaderError);
 	    	multiLoader.addEventListener(MultiLoaderEvent.COMPLETE, multiLoaderCompleteListener);
 			for each (var image: String in Images.PRE_IMAGES) {
@@ -109,6 +118,9 @@ package {
 		}
 		
 		private function multiLoaderCompleteListener(event:MultiLoaderEvent):void {
+			if (_preloaderShown) {
+				preloaderForm.progress += 1;
+			}
 			if (multiLoader.isLoaded) {
 				multiLoader.removeEventListener(ErrorEvent.ERROR, multiloaderError);
 				multiLoader.removeEventListener(MultiLoaderEvent.COMPLETE, multiLoaderCompleteListener);
@@ -116,7 +128,6 @@ package {
 				if (_preloaderShown) {
 					preloaderForm.destroy();
 					removeChild(preloaderForm);
-					core = new Core(viewer_id, fullName, photoPath, server);
 					uiBarPlace = new UIBarPlace(this);
 					core.load();
 					addChild(uiBarPlace);
@@ -140,6 +151,7 @@ package {
 					for each (var image: String in Images.IMAGES) {
 						multiLoader.load(image, image, 'Bitmap');
 					}
+					preloaderForm.totalProgress = Images.IMAGES.length;
 				}
 			}
 		}

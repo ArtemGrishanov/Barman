@@ -1,16 +1,19 @@
 package com.bar.ui.windows
 {
 	import com.bar.ui.panels.ExchangePanel;
+	import com.flashmedia.basics.GameObjectEvent;
 	import com.flashmedia.basics.GameScene;
+	
+	import flash.filters.GlowFilter;
 
 	public class ExchangeWindow extends Window
 	{
-		public static const WIDTH: Number = 400;
-		public static const HEIGHT: Number = 200;
+		public static const WIDTH: Number = 556;
+		public static const HEIGHT: Number = 290;
 		
-		public static const TOP_INDENT: Number = 20;
-		public static const LEFT_INDENT: Number = 40;
-		public static const BETWEEN_X_INDENT: Number = 20;
+		public static const TOP_INDENT: Number = 35;
+		public static const LEFT_INDENT: Number = 15;
+		public static const BETWEEN_X_INDENT: Number = 10;
 		public static const BETWEEN_Y_INDENT: Number = 10;
 		
 		public var epCents1000: ExchangePanel;
@@ -63,6 +66,5 @@ package com.bar.ui.windows
 			addChild(epEuro5);
 			addChild(epEuro10);
 		}
-		
 	}
 }

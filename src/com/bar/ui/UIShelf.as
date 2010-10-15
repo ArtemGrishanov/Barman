@@ -16,8 +16,8 @@ package com.bar.ui
 	{
 		public static const GAME_OBJECT_TYPE: String = 'production';
 		
-		public static const SHELF_X: Number = 250;
-		public static const SHELF_Y: Number = 94;
+		public static const SHELF_X: Number = 247;
+		public static const SHELF_Y: Number = 81;
 		public static const SHELF_W: Number = 236;
 		public static const SHELF_H: Number = 231;
 		public static const SHELF_ROW_COUNT: Number = 3;
@@ -73,10 +73,10 @@ package com.bar.ui
 			}
 			highlights = new Array();
 			
-			graphics.lineStyle(2, 0xff0000);
-			graphics.drawRect(0,0,width,height / 3);
-			graphics.drawRect(0,height / 3,width,height / 3);
-			graphics.drawRect(0, 2 * height / 3,width,height / 3);
+//			graphics.lineStyle(2, 0xff0000);
+//			graphics.drawRect(0,0,width,height / 3);
+//			graphics.drawRect(0,height / 3,width,height / 3);
+//			graphics.drawRect(0, 2 * height / 3,width,height / 3);
 		}
 		
 		public function setBackground(b: Bitmap): void {

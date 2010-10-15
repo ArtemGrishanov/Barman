@@ -1,13 +1,15 @@
 package com.bar.ui.panels
 {
+	import com.bar.util.Images;
 	import com.flashmedia.basics.GameLayer;
 	import com.flashmedia.basics.GameObject;
 	import com.flashmedia.basics.GameObjectEvent;
 	import com.flashmedia.basics.GameScene;
+	import com.flashmedia.util.BitmapUtil;
 	
 	import flash.display.Bitmap;
-	import flash.display.BitmapData;
 	import flash.display.Sprite;
+	import flash.filters.GlowFilter;
 
 	public class ClientButtonsPanel extends GameLayer
 	{
@@ -17,21 +19,23 @@ package com.bar.ui.panels
 		public var serveButton: GameObject;
 //		public var cancelButton: GameObject;
 		public var denyButton: GameObject;
-		public var toBarButton: GameObject;
+//		public var toBarButton: GameObject;
 		
 		public function ClientButtonsPanel(value:GameScene)
 		{
 			super(value);
-			serveButton = createRoundButton(new Bitmap(new BitmapData(20, 20, false, 0x33ff22)));
+			serveButton = createRoundButton(BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.BTN_SERVE)));
 			addChild(serveButton);
 //			cancelButton = createRoundButton(new Bitmap(new BitmapData(20, 20, false, 0xff1122)));
 //			addChild(cancelButton);
-			denyButton = createRoundButton(new Bitmap(new BitmapData(20, 20, false, 0x334422)));
-			denyButton.x = 40;
+			denyButton = createRoundButton(BitmapUtil.cloneBitmap(Bar.multiLoader.get(Images.BTN_CLOSE)));
+			denyButton.x = serveButton.width;
 			addChild(denyButton);
-			toBarButton = createRoundButton(new Bitmap(new BitmapData(20, 20, false, 0xa3ffd2)));
-			toBarButton.x = 80;
-			addChild(toBarButton);
+			width = serveButton.width + denyButton.width;
+			height = serveButton.height;
+//			toBarButton = createRoundButton(new Bitmap(new BitmapData(20, 20, false, 0xa3ffd2)));
+//			toBarButton.x = 80;
+//			addChild(toBarButton);
 		}
 		
 		private function createRoundButton(bitmap: Bitmap): GameObject {
@@ -43,22 +47,27 @@ package com.bar.ui.panels
 			btn.setSelect(true, true, mask);
 			btn.setHover(true, false);
 			btn.bitmap = bitmap;
-			btn.addEventListener(GameObjectEvent.TYPE_LOST_HOVER, onButtonLostHover);
-			btn.addEventListener(GameObjectEvent.TYPE_MOUSE_DOWN, onButtonDown);
-			btn.addEventListener(GameObjectEvent.TYPE_MOUSE_UP, onButtonUp);
+			btn.addEventListener(GameObjectEvent.TYPE_SET_HOVER, onItemSetHover);
+			btn.addEventListener(GameObjectEvent.TYPE_LOST_HOVER, onItemLostHover);
+//			btn.addEventListener(GameObjectEvent.TYPE_MOUSE_DOWN, onButtonDown);
+//			btn.addEventListener(GameObjectEvent.TYPE_MOUSE_UP, onButtonUp);
 			return btn;
 		}
 		
-		public function onButtonLostHover(event: GameObjectEvent): void {
+		public function onItemSetHover(event: GameObjectEvent): void {
+			event.gameObject.applyFilter(new GlowFilter(0xffffff, 1, 10, 10));
+		}
+		
+		public function onItemLostHover(event: GameObjectEvent): void {
+			event.gameObject.removeFilter(GlowFilter);
+		}
+		
+//		public function onButtonDown(event: GameObjectEvent): void {
+//			event.gameObject.y += 2;
+//		}
+//		
+//		public function onButtonUp(event: GameObjectEvent): void {
 //			event.gameObject.y -= 2;
-		}
-		
-		public function onButtonDown(event: GameObjectEvent): void {
-			event.gameObject.y += 2;
-		}
-		
-		public function onButtonUp(event: GameObjectEvent): void {
-			event.gameObject.y -= 2;
-		}
+//		}
 	}
 }

@@ -52,7 +52,7 @@ package com.flashmedia.socialnet
 			}
 			switch (net) {
 				case NET_VKONTAKTE:
-					vkontakte.getFriends();
+					vkontakte.getProfiles(uids);
 				break;
 				case NET_MOIMIR:
 					
@@ -80,7 +80,7 @@ package com.flashmedia.socialnet
 				
 				break;
 				case NET_SANDBOX:
-					var friendsIds: Array = [1234239, 4546611, 564345, 4563650, 4235456, 93736563, 22554674, 9876633];
+					var friendsIds: Array = [57856825, 12402413, 4134197, 4930084];
 //					var friendsIds: Array = [1234239, 4546611];
 					dispatchFriendsEvent(friendsIds);
 				break;
@@ -90,6 +90,9 @@ package com.flashmedia.socialnet
 			}
 		}
 		
+		/**
+		 * users - Array of SocialNetUser
+		 */
 		private function dispatchUserInfoEvent(users: Array): void {
 			var event: SocialNetEvent = new SocialNetEvent(SocialNetEvent.USER_INFO);
 			event.users = users;
@@ -113,10 +116,28 @@ package com.flashmedia.socialnet
 			try {
 				switch (event.method) {
 					case 'getProfiles':
-						
+						var socialUsers: Array = new Array();
+						for each (var o: Object in response) {
+							var uid: Number = (o.hasOwnProperty('uid') ? o.uid : NaN);
+							var nickname: String = (o.hasOwnProperty('nickname') ? o.nickname : null);
+							var first_name: String = (o.hasOwnProperty('first_name') ? o.first_name : null);
+							var last_name: String = (o.hasOwnProperty('last_name') ? o.last_name : null);
+							var sex: Number = (o.hasOwnProperty('sex') ? o.sex : null);
+							var bdate: String = (o.hasOwnProperty('bdate') ? o.bdate : null);
+							var photo_big: String = (o.hasOwnProperty('photo_big') ? o.photo_big : null);
+							var photo_medium: String = (o.hasOwnProperty('photo_medium') ? o.photo_medium : null);
+							var photo: String = (o.hasOwnProperty('photo') ? o.photo : null);
+
+							var su: SocialNetUser = new SocialNetUser(uid, nickname, first_name, last_name, sex, bdate);
+							su.photoBigUrl = photo_big;
+							su.photoMediumUrl = photo_medium;
+							su.photoUrl = photo;
+							socialUsers.push(su); 
+						}
+						dispatchUserInfoEvent(socialUsers);
 					break;
 					case 'getFriends':
-						
+						dispatchFriendsEvent(response as Array);
 					break;
 					case 'getAppFriends':
 						
